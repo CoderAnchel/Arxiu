@@ -86,17 +86,22 @@ jobs:
 
       - run: uv python install 3.12
 
-      - name: 📥 Install deps
-        run: uv pip install --system ".[dev]"
+      # Ubuntu 24.04 marks the system Python as PEP 668 "externally managed",
+      # so we install into a project-local venv. `uv run` activates it
+      # automatically in every subsequent step.
+      - name: 📥 Install deps (in venv)
+        run: |
+          uv venv --python 3.12 .venv
+          uv pip install ".[dev]"
 
       - name: 🧹 Lint (ruff check)
-        run: ruff check .
+        run: uv run ruff check .
 
       - name: 🎨 Format check (ruff format)
-        run: ruff format --check .
+        run: uv run ruff format --check .
 
       - name: 🔍 Type check (mypy)
-        run: mypy app
+        run: uv run mypy app
 
       - name: 🧪 Tests + coverage
         env:
@@ -107,14 +112,15 @@ jobs:
         run: |
           openssl genpkey -algorithm RSA -out /tmp/jwt_private.pem -pkeyopt rsa_keygen_bits:2048
           openssl rsa -pubout -in /tmp/jwt_private.pem -out /tmp/jwt_public.pem
-          pytest --cov=app --cov-report=xml --cov-report=term
+          uv run pytest --cov=app --cov-report=xml --cov-report=term
 
       - name: 🛡️ Security audit (warn-only)
-        run: pip-audit --strict || true
+        run: uv run pip-audit --strict || true
 
       - name: 📊 Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
+          token: ${{ secrets.CODECOV_TOKEN }}
           files: apps/backend/coverage.xml
           flags: backend
           fail_ci_if_error: false
@@ -167,6 +173,7 @@ jobs:
       - name: 📊 Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
+          token: ${{ secrets.CODECOV_TOKEN }}
           files: apps/frontend/coverage/coverage-final.json,apps/frontend/coverage/lcov.info
           flags: frontend
           fail_ci_if_error: false

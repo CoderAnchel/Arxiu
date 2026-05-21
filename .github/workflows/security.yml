@@ -33,11 +33,13 @@ jobs:
 
       - run: uv python install 3.12
 
-      - name: Install deps
-        run: uv pip install --system ".[dev]"
+      - name: Install deps (in venv)
+        run: |
+          uv venv --python 3.12 .venv
+          uv pip install ".[dev]"
 
       - name: pip-audit
-        run: pip-audit --strict --format markdown > pip-audit.md || true
+        run: uv run pip-audit --strict --format markdown > pip-audit.md || true
 
       - uses: actions/upload-artifact@v4
         if: always()
