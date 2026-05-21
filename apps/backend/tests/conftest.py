@@ -90,6 +90,26 @@ async def db(engine) -> AsyncIterator[AsyncSession]:
 
 # --- HTTP client ------------------------------------------------------------
 
+def _reset_prometheus_registry() -> None:
+    """Unregister every collector from the default Prometheus registry.
+
+    `create_app()` calls `init_prometheus(app)` which registers Counter/Histogram
+    instances at the module level. The default registry is a singleton, so when
+    tests call `create_app()` more than once in the same process (which happens
+    in CI because tests share a process) it raises `Duplicated timeseries`.
+    Clearing the registry before each test makes the app factory idempotent
+    from the tests' point of view, without changing any production code.
+    """
+    from prometheus_client import REGISTRY
+
+    for collector in list(REGISTRY._collector_to_names.keys()):  # type: ignore[attr-defined]
+        try:
+            REGISTRY.unregister(collector)
+        except Exception:
+            # Default Python collectors raise when unregistered; harmless.
+            pass
+
+
 @pytest.fixture
 async def client(engine, monkeypatch) -> AsyncIterator[AsyncClient]:
     """An ASGI client with the engine wired into get_db() and a fake Redis."""
@@ -102,6 +122,7 @@ async def client(engine, monkeypatch) -> AsyncIterator[AsyncClient]:
     fake_redis = FakeRedis()
     monkeypatch.setattr(redis_module, "get_redis", lambda: fake_redis)
 
+    _reset_prometheus_registry()
     app = create_app()
 
     factory = async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
