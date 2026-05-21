@@ -39,7 +39,7 @@ RUN pnpm build
 # =============================================================================
 # Prod — nginx serving static
 # =============================================================================
-FROM nginx:1.27-alpine AS prod
+FROM nginx:1.31-alpine AS prod
 RUN apk add --no-cache curl
 COPY --from=build /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
