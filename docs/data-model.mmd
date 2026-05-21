@@ -1,0 +1,226 @@
+erDiagram
+    %% ===========================================================
+    %% Arxiu de notes — model de dades
+    %% ===========================================================
+
+    USERS ||--o{ ASSIGNACIONS_DOCENTS : "imparteix"
+    USERS ||--o{ GRUPS_CLASSE : "tutoritza"
+    USERS ||--o{ AUDIT_LOGS : "fa accions"
+
+    FAMILIES_PROFESSIONALS ||--o{ CICLES : "agrupa"
+    CICLES ||--o{ MODULS : "conté"
+    CICLES ||--o{ GRUPS_CLASSE : "instancia"
+    CICLES ||--o{ MATRICULES : "matricula a"
+    MODULS ||--o{ RAS : "es divideix en"
+    MODULS ||--o{ ASSIGNACIONS_DOCENTS : "assignat a"
+    MODULS ||--o{ QUALIFICACIONS_MODUL : "nota final"
+
+    CURSOS_ACADEMICS ||--o{ GRUPS_CLASSE : "any escolar"
+    CURSOS_ACADEMICS ||--o{ MATRICULES : "any escolar"
+    CURSOS_ACADEMICS ||--o{ ASSIGNACIONS_DOCENTS : "any escolar"
+    CURSOS_ACADEMICS ||--o{ AVALUACIONS : "any escolar"
+
+    ALUMNES ||--o{ TUTORS_LEGALS : "té"
+    ALUMNES ||--o{ MATRICULES : "es matricula"
+    ALUMNES ||--o{ ENVIAMENTS : "rep"
+
+    GRUPS_CLASSE ||--o{ MATRICULES : "agrupa"
+    GRUPS_CLASSE ||--o{ ASSIGNACIONS_DOCENTS : "té docents"
+
+    MATRICULES ||--o{ QUALIFICACIONS_RA : "té notes"
+    MATRICULES ||--o{ QUALIFICACIONS_MODUL : "té nota final"
+
+    RAS ||--o{ QUALIFICACIONS_RA : "es qualifica"
+
+    AVALUACIONS ||--o{ QUALIFICACIONS_RA : "període"
+    AVALUACIONS ||--o{ QUALIFICACIONS_MODUL : "període"
+
+    %% ============================================================
+    %% Entitats
+    %% ============================================================
+
+    USERS {
+        bigint id PK
+        string dni UK "login alternatiu"
+        string email UK "login alternatiu"
+        string password_hash "bcrypt"
+        bool must_change_password "primer accés"
+        enum role "admin|professor"
+        string nom
+        string cognoms
+        string departament
+        bool active
+        string mfa_secret "TOTP opcional"
+        datetime last_login_at
+        datetime deleted_at "soft delete"
+    }
+
+    FAMILIES_PROFESSIONALS {
+        bigint id PK
+        string codi UK
+        string nom
+        datetime deleted_at
+    }
+
+    CICLES {
+        bigint id PK
+        string codi UK "DAM, SMX…"
+        string nom
+        bigint familia_id FK
+        enum nivell "mig|superior"
+        int durada "anys"
+        datetime deleted_at
+    }
+
+    MODULS {
+        bigint id PK
+        bigint cicle_id FK
+        string codi "M03, M06…"
+        string nom
+        int curs "1 o 2"
+        int hores
+        datetime deleted_at
+    }
+
+    RAS {
+        bigint id PK
+        bigint modul_id FK
+        int ordre
+        string codi "RA1, RA2…"
+        text descripcio
+        decimal pes "0-100 %"
+        datetime deleted_at
+    }
+
+    CURSOS_ACADEMICS {
+        bigint id PK
+        string nom UK "2025-2026"
+        bool actiu
+        date data_inici
+        date data_fi
+    }
+
+    ALUMNES {
+        bigint id PK
+        string ralc UK "NIA / RALC"
+        string dni
+        string nom
+        string cognoms
+        string email
+        string telefon
+        date data_naixement
+        datetime deleted_at
+    }
+
+    TUTORS_LEGALS {
+        bigint id PK
+        bigint alumne_id FK
+        string nom
+        string email
+        string telefon
+    }
+
+    GRUPS_CLASSE {
+        bigint id PK
+        string codi "DAM1A"
+        bigint curs_acad_id FK
+        bigint cicle_id FK
+        int curs "1 o 2"
+        bigint tutor_user_id FK
+        datetime deleted_at
+    }
+
+    MATRICULES {
+        bigint id PK
+        bigint alumne_id FK
+        bigint grup_id FK
+        bigint cicle_id FK
+        bigint curs_acad_id FK
+        int curs "1 o 2"
+        enum tipus "primari|secundari"
+        enum estat "actiu|finalitzat|baixa"
+        datetime deleted_at
+    }
+
+    ASSIGNACIONS_DOCENTS {
+        bigint id PK
+        bigint user_id FK "docent"
+        bigint grup_id FK
+        bigint modul_id FK
+        bigint curs_acad_id FK
+        datetime deleted_at
+    }
+
+    AVALUACIONS {
+        bigint id PK
+        bigint curs_acad_id FK
+        string nom "1a Avaluació…"
+        int ordre
+        enum estat "oberta|docent|junta|tancada"
+        date data_inici
+        date data_tancament
+        datetime deleted_at
+    }
+
+    QUALIFICACIONS_RA {
+        bigint id PK
+        bigint matricula_id FK
+        bigint ra_id FK
+        bigint avaluacio_id FK
+        decimal nota "0-10"
+        text comentari
+        bigint professor_user_id FK
+        datetime updated_at
+    }
+
+    QUALIFICACIONS_MODUL {
+        bigint id PK
+        bigint matricula_id FK
+        bigint modul_id FK
+        bigint avaluacio_id FK
+        decimal nota "override manual"
+        text comentari
+        bigint professor_user_id FK
+        datetime updated_at
+    }
+
+    ENVIAMENTS {
+        bigint id PK
+        bigint alumne_id FK
+        string destinatari_email
+        enum tipus "butlleti|comunicat"
+        string assumpte
+        text body
+        string adjunt_path
+        enum estat "queued|enviat|obert|rebotat|error"
+        datetime queued_at
+        datetime sent_at
+        datetime opened_at
+    }
+
+    IMPORTS {
+        bigint id PK
+        enum tipus "alumnes|matricules|notes"
+        string fitxer_path
+        bigint user_id FK
+        int total
+        int ok
+        int errors
+        json log
+        enum estat "pending|processing|completed|failed"
+        datetime created_at
+        datetime completed_at
+    }
+
+    AUDIT_LOGS {
+        bigint id PK
+        bigint user_id FK
+        string action "qualif_ra_updated…"
+        string entity
+        string entity_id
+        json before
+        json after
+        string ip
+        string user_agent
+        datetime created_at
+    }

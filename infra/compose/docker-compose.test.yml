@@ -1,0 +1,29 @@
+# Test stack — used by CI and `make e2e`.
+# Differences from dev: ephemeral volumes, prod-target images, mocked SMTP.
+
+services:
+  mysql:
+    tmpfs:
+      - /var/lib/mysql                # ephemeral
+
+  redis:
+    tmpfs:
+      - /data
+
+  backend:
+    build:
+      target: prod
+    environment:
+      APP_ENV: staging
+      LOG_LEVEL: WARNING
+
+  frontend:
+    build:
+      target: prod
+    ports:
+      - "8080:8080"
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    networks:
+      - backend-net

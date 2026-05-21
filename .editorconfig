@@ -1,0 +1,28 @@
+# EditorConfig — https://editorconfig.org
+# Top-most config; descendants stop the search here.
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+
+# Python — PEP 8 indentation
+[*.{py,pyi}]
+indent_size = 4
+max_line_length = 110
+
+# Markdown — preserve trailing spaces (used for line breaks)
+[*.md]
+trim_trailing_whitespace = false
+
+# Makefiles — tabs are mandatory
+[{Makefile,makefile,GNUmakefile}]
+indent_style = tab
+
+# PowerShell — Windows convention
+[*.{ps1,psm1,psd1,bat,cmd}]
+end_of_line = crlf

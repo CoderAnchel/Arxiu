@@ -1,0 +1,18 @@
+{
+  "name": "arxiu-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Arxiu de notes — production grade management for Institut la Ferreria",
+  "scripts": {
+    "frontend": "pnpm --filter @arxiu/frontend",
+    "lint": "pnpm --filter @arxiu/frontend lint",
+    "typecheck": "pnpm --filter @arxiu/frontend typecheck",
+    "test": "pnpm --filter @arxiu/frontend test",
+    "build": "pnpm --filter @arxiu/frontend build"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@9.15.0"
+}

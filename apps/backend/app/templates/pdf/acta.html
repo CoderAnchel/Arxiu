@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="utf-8">
+  <title>Acta de Junta d'Avaluació · {{ grup.codi }} · {{ avaluacio.nom }}</title>
+  <style>
+    @page {
+      size: A4 landscape;
+      margin: 18mm 14mm 16mm 14mm;
+      @top-left {
+        content: "{{ centre_nom }} · Acta de Junta d'Avaluació";
+        font-size: 8pt;
+        color: #555;
+        font-family: Georgia, serif;
+      }
+      @bottom-right {
+        content: "Pàg. " counter(page) " / " counter(pages);
+        font-size: 8pt;
+        color: #666;
+        font-family: Georgia, serif;
+      }
+    }
+
+    body {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 9.5pt;
+      color: #111;
+      line-height: 1.4;
+      margin: 0;
+    }
+
+    .header {
+      border-bottom: 2px solid #111;
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 20pt;
+      font-style: italic;
+      font-weight: normal;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 22px;
+      margin-top: 6px;
+      font-size: 9pt;
+      color: #333;
+    }
+
+    .meta b {
+      color: #111;
+      font-weight: 600;
+    }
+
+    .summary {
+      display: flex;
+      gap: 16px;
+      margin: 14px 0;
+      font-size: 9pt;
+    }
+
+    .summary-card {
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 6px 12px;
+      background: #f6f5ef;
+    }
+
+    .summary-card .lab {
+      display: block;
+      font-size: 7.5pt;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #555;
+    }
+
+    .summary-card .val {
+      font-size: 14pt;
+      font-weight: 600;
+    }
+
+    table.acta {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 9pt;
+    }
+
+    table.acta thead th {
+      background: #eee;
+      border: 1px solid #999;
+      padding: 4px 5px;
+      font-weight: 600;
+      font-size: 8pt;
+      text-align: left;
+      vertical-align: bottom;
+    }
+
+    table.acta thead th.modul-col {
+      writing-mode: horizontal-tb;
+      max-width: 50px;
+      font-size: 7.5pt;
+      text-align: center;
+    }
+
+    table.acta tbody td {
+      border: 1px solid #bbb;
+      padding: 3px 5px;
+      vertical-align: middle;
+    }
+
+    table.acta tbody td.alumne {
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    table.acta tbody td.alumne .dni {
+      display: block;
+      font-size: 7.5pt;
+      color: #666;
+      font-weight: normal;
+    }
+
+    table.acta tbody td.nota {
+      text-align: center;
+      font-family: "Courier New", monospace;
+      font-size: 9.5pt;
+    }
+
+    .nota.suspes,
+    .nota-col.suspes {
+      color: #b5453e;
+      font-weight: 700;
+    }
+
+    .nota.exc,
+    .nota-col.exc {
+      color: #2f7a41;
+      font-weight: 700;
+    }
+
+    .nota.pendent,
+    .nota-col.pendent {
+      color: #999;
+    }
+
+    .nota .manual-mark {
+      display: inline-block;
+      font-size: 7pt;
+      color: #2f7a41;
+      vertical-align: super;
+    }
+
+    td.decisio {
+      font-weight: 600;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .dec-Apte { background: #e8f3eb; color: #2f7a41; }
+    .dec-Recupera { background: #fff4d6; color: #8a6300; }
+    .dec-NoPromociona { background: #fbe8e6; color: #b5453e; }
+    .dec-Pendent { background: #eee; color: #555; }
+
+    .signatures {
+      page-break-inside: avoid;
+      margin-top: 30px;
+      display: flex;
+      justify-content: space-around;
+      gap: 20px;
+    }
+
+    .sig-block {
+      text-align: center;
+      flex: 1;
+    }
+
+    .sig-line {
+      border-top: 1px solid #111;
+      width: 200px;
+      margin: 50px auto 4px;
+    }
+
+    .sig-label {
+      font-size: 9pt;
+      color: #333;
+    }
+
+    .sig-name {
+      font-style: italic;
+      font-size: 9.5pt;
+      color: #111;
+      margin-top: 2px;
+    }
+
+    .legend {
+      font-size: 8pt;
+      color: #555;
+      margin-top: 8px;
+      font-style: italic;
+    }
+
+    .comentari-row td {
+      background: #fbfaf5;
+      font-size: 8pt;
+      color: #444;
+      font-style: italic;
+      padding: 2px 8px 4px;
+      border-top: none;
+    }
+
+    /* ---- Detail per alumne (page break per alumne) ---- */
+    .detail-section {
+      page-break-before: always;
+      margin-top: 0;
+    }
+
+    .detail-section h2 {
+      margin: 0 0 6px;
+      font-size: 16pt;
+      font-style: italic;
+      font-weight: normal;
+      border-bottom: 1px solid #999;
+      padding-bottom: 4px;
+    }
+
+    .alumne-block {
+      /* Avoid splitting the alumne header from the first modul block, but
+         allow consecutive alumnes to share a page if they fit. */
+      page-break-inside: avoid;
+      margin: 0 0 18px;
+      padding: 10px 12px 12px;
+      border: 1px solid #999;
+      border-radius: 3px;
+      background: #fafafa;
+    }
+
+    .alumne-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 6px;
+      margin-bottom: 8px;
+    }
+
+    .alumne-head h3 {
+      margin: 0;
+      font-style: italic;
+      font-size: 14pt;
+      font-weight: normal;
+    }
+
+    .alumne-head .dni-block {
+      font-family: "Courier New", monospace;
+      font-size: 8.5pt;
+      color: #555;
+    }
+
+    .alumne-head .decisio-block {
+      padding: 3px 10px;
+      border-radius: 3px;
+      font-weight: 600;
+      font-size: 9.5pt;
+    }
+
+    .modul-detail {
+      margin: 0 0 10px;
+      page-break-inside: avoid;
+    }
+
+    .modul-detail-head {
+      display: flex;
+      gap: 8px;
+      align-items: baseline;
+      margin-bottom: 4px;
+    }
+
+    .modul-detail-head .codi {
+      font-family: "Courier New", monospace;
+      font-size: 9pt;
+      color: #666;
+      font-weight: 600;
+    }
+
+    .modul-detail-head .nom {
+      font-style: italic;
+      font-size: 11pt;
+      flex: 1;
+    }
+
+    .modul-detail-head .final {
+      font-family: "Courier New", monospace;
+      font-size: 11pt;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 3px;
+      background: #eee;
+    }
+
+    .modul-detail-head .final.suspes { background: #fbe8e6; color: #b5453e; }
+    .modul-detail-head .final.exc { background: #e8f3eb; color: #2f7a41; }
+    .modul-detail-head .final.pendent { color: #888; background: #f4f4f4; }
+    .modul-detail-head .final .manual-mark {
+      font-size: 7pt;
+      vertical-align: super;
+      color: #2f7a41;
+    }
+
+    table.ra-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 8.5pt;
+      margin-top: 4px;
+    }
+
+    table.ra-table th {
+      background: #f0eee7;
+      border: 1px solid #ccc;
+      padding: 3px 6px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 7.5pt;
+    }
+
+    table.ra-table td {
+      border: 1px solid #ddd;
+      padding: 3px 6px;
+      vertical-align: top;
+    }
+
+    table.ra-table td.codi-col {
+      font-family: "Courier New", monospace;
+      width: 40px;
+      color: #555;
+    }
+
+    table.ra-table td.pes-col {
+      width: 50px;
+      text-align: right;
+      font-family: "Courier New", monospace;
+      color: #555;
+    }
+
+    table.ra-table td.nota-col {
+      width: 55px;
+      text-align: center;
+      font-family: "Courier New", monospace;
+      font-weight: 600;
+    }
+
+    .modul-comentari {
+      font-size: 8pt;
+      color: #555;
+      font-style: italic;
+      margin: 4px 0 0;
+      padding: 4px 8px;
+      background: #fffbe6;
+      border-left: 2px solid #d4a000;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Acta de Junta d'Avaluació</h1>
+    <div class="meta">
+      <span><b>Centre:</b> {{ centre_nom }}</span>
+      <span><b>Curs acadèmic:</b> {{ curs.nom if curs else "—" }}</span>
+      <span><b>Cicle:</b> {{ cicle.codi if cicle else "—" }} · {{ cicle.nom if cicle else "" }}</span>
+      <span><b>Grup:</b> {{ grup.codi }} ({{ grup.curs }}r curs)</span>
+      <span><b>Avaluació:</b> {{ avaluacio.nom }} ({{ avaluacio_estat }})</span>
+      <span><b>Data avaluació:</b> {{ data_avaluacio }}</span>
+      <span><b>Tutor/a:</b> {{ tutor.nom ~ ' ' ~ tutor.cognoms if tutor else "—" }}</span>
+      <span><b>Emès:</b> {{ data_emissio }}</span>
+    </div>
+  </div>
+
+  <div class="summary">
+    <div class="summary-card"><span class="lab">Alumnes</span><span class="val">{{ total }}</span></div>
+    <div class="summary-card"><span class="lab">Aptes</span><span class="val">{{ counts.get('Apte', 0) }}</span></div>
+    <div class="summary-card"><span class="lab">Recuperen</span><span class="val">{{ counts.get('Recupera', 0) }}</span></div>
+    <div class="summary-card"><span class="lab">No promocionen</span><span class="val">{{ counts.get('No promociona', 0) }}</span></div>
+    <div class="summary-card"><span class="lab">Pendents</span><span class="val">{{ counts.get('Pendent', 0) }}</span></div>
+  </div>
+
+  <table class="acta">
+    <thead>
+      <tr>
+        <th>Alumne</th>
+        {% for m in moduls %}
+          <th class="modul-col">
+            {{ m.codi }}{% if m.bloquejant %}<span style="color:#b5453e;" title="Mòdul bloquejant">*</span>{% endif %}
+            <br><span style="font-weight: normal; font-size: 6.5pt;">{{ m.nom[:18] }}</span>
+          </th>
+        {% endfor %}
+        <th style="text-align:center;">Suspesos</th>
+        <th style="text-align:center;">Decisió</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+        <tr>
+          <td class="alumne">
+            {{ row.cognoms }}, {{ row.nom }}
+            <span class="dni">{{ row.dni or row.ralc }}</span>
+          </td>
+          {% for n in row.notes_per_modul %}
+            {% set cls = 'pendent' if n.nota is none else ('suspes' if n.nota < 5 else ('exc' if n.nota >= 9 else '')) %}
+            <td class="nota {{ cls }}">
+              {% if n.nota is none %}—{% else %}{{ "%.2f"|format(n.nota) }}{% endif %}
+              {% if n.is_manual %}<span class="manual-mark" title="Manual">M</span>{% endif %}
+            </td>
+          {% endfor %}
+          <td class="nota">{{ row.suspesos }}{% if row.no_qualificats %} <span style="color:#999;">(+{{ row.no_qualificats }} NQ)</span>{% endif %}</td>
+          <td class="decisio dec-{{ row.decisio | replace(' ', '') }}">{{ row.decisio }}</td>
+        </tr>
+        {% set ns = namespace(has=false) %}
+        {% for n in row.notes_per_modul if n.comentari %}{% set ns.has = true %}{% endfor %}
+        {% if ns.has %}
+          <tr class="comentari-row">
+            <td colspan="{{ moduls|length + 3 }}">
+              {% for n in row.notes_per_modul if n.comentari %}
+                <strong>{{ n.codi }}:</strong> {{ n.comentari }}{% if not loop.last %} · {% endif %}
+              {% endfor %}
+            </td>
+          </tr>
+        {% endif %}
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <p class="legend">
+    Llegenda: <strong>M</strong> = nota final manual pel docent.
+    <span style="color:#b5453e;">*</span> = mòdul bloquejant (un suspès aquí força "No promociona").
+    Decisions automàtiques segons la <strong>política del cicle</strong>
+    (cicle <strong>{{ cicle.codi if cicle else "—" }}</strong>:
+    màx. {{ cicle.max_suspesos_recupera if cicle else 2 }} suspesos per a "Recupera"{% if cicle and cicle.pct_hores_no_promociona %},
+    {{ cicle.pct_hores_no_promociona }}% d'hores suspeses força "No promociona"{% endif %}).
+    Aquestes són propostes que la junta pot ratificar o modificar.
+  </p>
+
+  {# ============================================================
+     Detall per alumne — un bloc per cada alumne amb totes les RAs
+     ============================================================ #}
+  <section class="detail-section">
+    <h2>Detall per alumne</h2>
+    {% for row in rows %}
+      <div class="alumne-block">
+        <div class="alumne-head">
+          <h3>{{ row.cognoms }}, {{ row.nom }}</h3>
+          <span class="dni-block">DNI {{ row.dni or "—" }} · RALC {{ row.ralc }}</span>
+          <span class="decisio-block dec-{{ row.decisio | replace(' ', '') }}">{{ row.decisio }}</span>
+        </div>
+        {% if row.motiu_decisio %}
+          <p style="margin: -4px 0 8px; font-size: 8.5pt; color: #555; font-style: italic;">
+            Motiu: {{ row.motiu_decisio }}
+          </p>
+        {% endif %}
+
+        {% for n in row.notes_per_modul %}
+          <div class="modul-detail">
+            <div class="modul-detail-head">
+              <span class="codi">{{ n.codi }}{% if n.bloquejant %}<span style="color:#b5453e;" title="Mòdul bloquejant">*</span>{% endif %}</span>
+              <span class="nom">{{ n.nom }}{% if n.hores %} <span style="color:#888; font-style: normal; font-size: 9pt;">({{ n.hores }}h)</span>{% endif %}</span>
+              {% set fcls = 'pendent' if n.nota is none else ('suspes' if n.nota < 5 else ('exc' if n.nota >= 9 else '')) %}
+              <span class="final {{ fcls }}">
+                {% if n.nota is none %}—{% else %}{{ "%.2f"|format(n.nota) }}{% endif %}
+                {% if n.is_manual %}<span class="manual-mark">M</span>{% endif %}
+              </span>
+            </div>
+
+            {% if n.ras %}
+              <table class="ra-table">
+                <thead>
+                  <tr>
+                    <th>RA</th>
+                    <th>Descripció</th>
+                    <th style="text-align: right;">Pes</th>
+                    <th style="text-align: center;">Nota</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for ra in n.ras %}
+                    {% set racls = 'pendent' if ra.nota is none else ('suspes' if ra.nota < 5 else ('exc' if ra.nota >= 9 else '')) %}
+                    <tr>
+                      <td class="codi-col">{{ ra.codi }}</td>
+                      <td>{{ ra.descripcio }}</td>
+                      <td class="pes-col">{{ "%.2f"|format(ra.pes) }}%</td>
+                      <td class="nota-col {{ racls }}">
+                        {% if ra.nota is none %}<span style="color:#999;">—</span>{% else %}{{ "%.2f"|format(ra.nota) }}{% endif %}
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            {% else %}
+              <p class="modul-comentari">El mòdul no té cap RA definit.</p>
+            {% endif %}
+
+            {% if n.comentari %}
+              <p class="modul-comentari">{{ n.comentari }}</p>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% endfor %}
+  </section>
+
+  <div class="signatures">
+    <div class="sig-block">
+      <div class="sig-line"></div>
+      <div class="sig-label">Tutor/a del grup</div>
+      <div class="sig-name">{{ tutor_signat or (tutor.nom ~ ' ' ~ tutor.cognoms if tutor else '') }}</div>
+    </div>
+    <div class="sig-block">
+      <div class="sig-line"></div>
+      <div class="sig-label">Cap d'estudis</div>
+      <div class="sig-name">{{ cap_estudis_signat or "" }}</div>
+    </div>
+    <div class="sig-block">
+      <div class="sig-line"></div>
+      <div class="sig-label">Director/a</div>
+      <div class="sig-name">{{ director_signat or "" }}</div>
+    </div>
+  </div>
+</body>
+</html>

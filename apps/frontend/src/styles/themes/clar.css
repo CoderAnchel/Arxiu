@@ -1,0 +1,6 @@
+/* "Clar" theme — academic modern. Uses :root defaults from tokens.css; this file
+   exists so the theme switcher can import all three themes uniformly. */
+
+[data-theme="clar"] {
+  /* No overrides — clar is the baseline defined in tokens.css :root. */
+}

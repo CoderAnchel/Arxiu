@@ -1,0 +1,206 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ============================================================================
+  # Detect which parts of the repo changed so each job only runs when needed.
+  # ============================================================================
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+      docker: ${{ steps.filter.outputs.docker }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            backend:
+              - 'apps/backend/**'
+              - '.github/workflows/ci.yml'
+            frontend:
+              - 'apps/frontend/**'
+              - '.github/workflows/ci.yml'
+            docker:
+              - 'apps/backend/Dockerfile'
+              - 'apps/frontend/Dockerfile'
+              - 'infra/compose/**'
+              - '.github/workflows/ci.yml'
+
+  # ============================================================================
+  backend:
+    needs: changes
+    if: ${{ needs.changes.outputs.backend == 'true' }}
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: testroot
+          MYSQL_DATABASE: arxiu_test
+          MYSQL_USER: arxiu
+          MYSQL_PASSWORD: testpw
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -u root -ptestroot"
+          --health-interval=5s --health-timeout=3s --health-retries=20
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping" --health-interval=5s --health-retries=10
+
+    defaults:
+      run:
+        working-directory: apps/backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 📦 Install system deps for WeasyPrint
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz0b libcairo2 libgdk-pixbuf-2.0-0 \
+            shared-mime-info libffi-dev fonts-dejavu
+
+      - name: 🐍 Set up Python via uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "0.5.11"
+
+      - run: uv python install 3.12
+
+      - name: 📥 Install deps
+        run: uv pip install --system ".[dev]"
+
+      - name: 🧹 Lint (ruff check)
+        run: ruff check .
+
+      - name: 🎨 Format check (ruff format)
+        run: ruff format --check .
+
+      - name: 🔍 Type check (mypy)
+        run: mypy app
+
+      - name: 🧪 Tests + coverage
+        env:
+          DATABASE_URL: mysql+asyncmy://arxiu:testpw@127.0.0.1:3306/arxiu_test?charset=utf8mb4
+          REDIS_URL: redis://127.0.0.1:6379/0
+          JWT_PRIVATE_KEY_PATH: /tmp/jwt_private.pem
+          JWT_PUBLIC_KEY_PATH: /tmp/jwt_public.pem
+        run: |
+          openssl genpkey -algorithm RSA -out /tmp/jwt_private.pem -pkeyopt rsa_keygen_bits:2048
+          openssl rsa -pubout -in /tmp/jwt_private.pem -out /tmp/jwt_public.pem
+          pytest --cov=app --cov-report=xml --cov-report=term
+
+      - name: 🛡️ Security audit (warn-only)
+        run: pip-audit --strict || true
+
+      - name: 📊 Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: apps/backend/coverage.xml
+          flags: backend
+          fail_ci_if_error: false
+
+      - name: 📦 Archive coverage XML
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-coverage
+          path: apps/backend/coverage.xml
+
+  # ============================================================================
+  frontend:
+    needs: changes
+    if: ${{ needs.changes.outputs.frontend == 'true' }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+          cache-dependency-path: apps/frontend/pnpm-lock.yaml
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: 🧹 Lint (eslint)
+        run: pnpm lint
+
+      - name: 🔍 Type check (tsc)
+        run: pnpm typecheck
+
+      - name: 🧪 Tests + coverage
+        run: pnpm test:cov
+
+      - name: 🏗️ Build
+        run: pnpm build
+
+      - name: 🛡️ Audit (warn-only)
+        run: pnpm audit --audit-level=high || true
+
+      - name: 📊 Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: apps/frontend/coverage/coverage-final.json,apps/frontend/coverage/lcov.info
+          flags: frontend
+          fail_ci_if_error: false
+
+      - name: 📦 Archive frontend coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: frontend-coverage
+          path: apps/frontend/coverage/
+
+  # ============================================================================
+  docker:
+    needs: [changes, backend, frontend]
+    if: ${{ always() && needs.changes.outputs.docker == 'true' && !failure() && !cancelled() }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+
+      - name: 🐳 Build backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: apps/backend
+          target: prod
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: 🐳 Build frontend image
+        uses: docker/build-push-action@v6
+        with:
+          context: apps/frontend
+          target: prod
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

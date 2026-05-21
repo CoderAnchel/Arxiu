@@ -1,0 +1,61 @@
+flowchart TD
+    %% ===========================================================
+    %% Arxiu de notes — creació d'usuari + primer accés
+    %% ===========================================================
+
+    Start([Admin obre /docents]) --> NewBtn["Clica + Nou docent"]
+    NewBtn --> Form[/"Modal: DNI, email, nom,<br/>cognoms, rol, departament"/]
+    Form --> Submit[POST /api/v1/admin/users]
+
+    Submit --> AuthCheck{Token vàlid<br/>i rol = admin?}
+    AuthCheck -->|no| Err403[/"403 permission_denied"/]
+    AuthCheck -->|sí| ValDni{DNI format<br/>i unicitat}
+
+    ValDni -->|invàlid| Err422[/"422 validation_error"/]
+    ValDni -->|duplicat| Err409[/"409 conflict<br/>DNI o email existeix"/]
+    ValDni -->|ok| GenPwd[Genera contrasenya<br/>16 chars · alfanumèric + símbols]
+
+    GenPwd --> Hash[bcrypt cost 12<br/>password_hash]
+    Hash --> Insert[(INSERT users<br/>must_change_password = TRUE<br/>password_set_at = now)]
+    Insert --> Audit[(INSERT audit_logs<br/>action = user_created)]
+    Audit --> RedisCache[(SET Redis 5min<br/>pwd:user_id → plaintext)]
+    RedisCache --> Resp[/"201 Created<br/>+ generated_password (reveal-once)"/]
+
+    Resp --> Modal[/"Modal: contrasenya<br/>visible 1 cop"/]
+    Modal --> Choice{Admin tria}
+    Choice -->|Copiar| Manual[Comparteix manualment]
+    Choice -->|Email| Send[POST /admin/users/:id/email-password]
+    Send --> RedisGet{Redis TTL<br/>encara vàlid?}
+    RedisGet -->|no| Regen[/"Cal regenerar<br/>contrasenya"/]
+    RedisGet -->|sí| Smtp[aiosmtplib<br/>plantilla Jinja2]
+    Smtp --> Sent[Email enviat<br/>+ audit log]
+
+    Manual --> FirstLogin([Usuari rep credencials])
+    Sent --> FirstLogin
+    FirstLogin --> Login[POST /auth/login<br/>identifier + password]
+
+    Login --> Match{password OK?}
+    Match -->|no| Err401[/"401 invalid_credentials<br/>rate limit 5/min"/]
+    Match -->|sí| FlagCheck{must_change<br/>_password?}
+    FlagCheck -->|sí| ShortToken[Token curt<br/>scope: change-password]
+    FlagCheck -->|no| FullToken[Access + refresh<br/>complets]
+
+    ShortToken --> Redir[/"Frontend: redirect<br/>/change-password"/]
+    Redir --> NewForm[/"Form: nova contrasenya<br/>+ confirmació"/]
+    NewForm --> Validate{Force min 12 chars<br/>zxcvbn score ≥ 3}
+    Validate -->|feble| Reject[/"422 password_weak"/]
+    Validate -->|fort| Save[(UPDATE users<br/>must_change_password = FALSE<br/>password_set_by_user_id = self)]
+    Save --> AuditChange[(INSERT audit_logs<br/>password_changed)]
+    AuditChange --> NewSession[Emet token complet<br/>+ refresh cookie]
+    NewSession --> Dashboard([Accés al dashboard])
+
+    FullToken --> Dashboard
+
+    classDef ok fill:#e8f3eb,stroke:#2f7a41,color:#1a3d22
+    classDef err fill:#fbe8e6,stroke:#b5453e,color:#5a1e1c
+    classDef store fill:#f5f1e8,stroke:#6c6862,color:#2a2724
+    classDef action fill:#fff,stroke:#6c6862,color:#2a2724
+
+    class Resp,Sent,Dashboard,NewSession,FullToken,ShortToken ok
+    class Err403,Err409,Err422,Err401,Reject,Regen err
+    class Insert,Audit,RedisCache,Save,AuditChange store

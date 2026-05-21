@@ -1,0 +1,432 @@
+/* App shell layout — lifted from the mockup styles.css. */
+
+.app {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  transition: grid-template-columns 0.25s ease;
+}
+
+.app.collapsed {
+  grid-template-columns: 64px 1fr;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: var(--bg);
+}
+
+/* ---------- Sidebar ---------- */
+
+.sidebar {
+  background: var(--bg-2);
+  border-right: 1px solid var(--line);
+  padding: 16px 0 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  /* `overflow: visible` so the collapse button can protrude.
+     Inner nav scrolls if content overflows. */
+  overflow: visible;
+}
+
+.collapseBtn {
+  position: absolute;
+  top: 14px;
+  right: -11px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  cursor: pointer;
+  color: var(--ink-2);
+  font-size: 12px;
+  box-shadow: 0 1px 4px -1px oklch(0.1 0.02 270 / 0.15);
+}
+
+.collapseBtn:hover {
+  background: var(--bg-2);
+  color: var(--ink);
+}
+
+/* The scrollable nav area between brand and user card */
+.navArea {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px 12px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.brandMark {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r);
+  background: var(--accent);
+  color: var(--bg);
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.brandTitle {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 17px;
+  flex: 1;
+  letter-spacing: -0.01em;
+}
+
+.brandSub {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  color: var(--ink-3);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.app.collapsed .brandTitle,
+.app.collapsed .brandSub,
+.app.collapsed .navLabel,
+.app.collapsed .navItem span:not(.ico):not(.kbd),
+.app.collapsed .courseMeta {
+  display: none;
+}
+
+.navSection {
+  margin-top: 16px;
+}
+
+.navLabel {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  padding: 0 16px 6px;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 16px;
+  margin: 1px 8px;
+  border-radius: var(--r);
+  cursor: pointer;
+  font-size: 13.5px;
+  color: var(--ink-2);
+  text-decoration: none;
+  user-select: none;
+}
+
+.navItem:hover {
+  background: var(--bg-3);
+  color: var(--ink);
+}
+
+.navItem.active {
+  background: var(--accent-bg);
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.navItem .ico {
+  width: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-3);
+}
+
+.navItem.active .ico {
+  color: var(--accent);
+}
+
+.navItem .kbd {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink-3);
+  border: 1px solid var(--line);
+  padding: 0 5px;
+  border-radius: var(--r-sm);
+}
+
+/* ---------- Theme switcher ---------- */
+
+.themeSwitcher {
+  margin-top: auto;
+  padding: 8px 0 6px;
+  border-top: 1px solid var(--line-soft);
+  background: var(--bg-2);
+  flex-shrink: 0;
+}
+
+.themeSwitcher .navLabel {
+  padding: 0 16px 6px;
+}
+
+.themePills {
+  display: flex;
+  gap: 6px;
+  padding: 0 12px;
+}
+
+.themePill {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 2px;
+  border-radius: var(--r);
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--ink-2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-family: var(--sans);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.themePill[data-active="true"] {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+
+.themePillIcon {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.themePillLabel {
+  font-size: 9.5px;
+  letter-spacing: 0.04em;
+}
+
+/* When sidebar is collapsed: stack the 3 theme pills vertically */
+.app.collapsed .themeSwitcher .navLabel {
+  display: none;
+}
+
+.app.collapsed .themePills {
+  flex-direction: column;
+  gap: 4px;
+  padding: 0 10px;
+}
+
+.app.collapsed .themePill {
+  padding: 6px 0;
+}
+
+.app.collapsed .themePillLabel {
+  display: none;
+}
+
+/* ---------- User card ---------- */
+
+.userCard {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-top: 1px solid var(--line-soft);
+  background: var(--bg-2);
+  flex-shrink: 0;
+}
+
+.app.collapsed .userCard {
+  padding: 10px 8px;
+  justify-content: center;
+}
+
+.userAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--bg-3);
+  color: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.userMeta {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.userName {
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.userRole {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink-3);
+}
+
+.app.collapsed .userMeta {
+  display: none;
+}
+
+/* ---------- Topbar ---------- */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.crumbs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+.crumbs .home {
+  color: var(--ink-2);
+}
+
+.crumbs .now {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.crumbs .sep {
+  opacity: 0.4;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.iconBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r);
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--ink-2);
+  position: relative;
+}
+
+.iconBtn:hover {
+  background: var(--bg-3);
+}
+
+.btn {
+  padding: 6px 12px;
+  border-radius: var(--r);
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn:hover {
+  background: var(--bg-3);
+}
+
+.btn.primary {
+  background: var(--accent);
+  color: var(--bg);
+  border-color: var(--accent);
+}
+
+.btn.primary:hover {
+  opacity: 0.9;
+}
+
+/* Topbar search trigger (opens Cmd+K) */
+.searchTrigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px 6px 12px;
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  cursor: pointer;
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--ink-3);
+  min-width: 280px;
+}
+
+.searchTrigger:hover {
+  background: var(--bg-3);
+  color: var(--ink-2);
+}
+
+.searchLbl {
+  flex: 1;
+  text-align: left;
+}
+
+.searchKbd {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink-3);
+  border: 1px solid var(--line);
+  padding: 0 5px;
+  border-radius: var(--r-sm);
+}
+
+/* When sidebar is collapsed, only show icons in nav items */
+.app.collapsed .navItem span:nth-child(2),
+.app.collapsed .navItem .kbd {
+  display: none;
+}
+
+/* Better spacing for icon in nav item */
+.navItem .ico svg {
+  display: block;
+}

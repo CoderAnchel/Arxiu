@@ -1,0 +1,59 @@
+stateDiagram-v2
+    %% ===========================================================
+    %% Arxiu de notes — màquina d'estats de les avaluacions
+    %% ===========================================================
+
+    [*] --> oberta : Admin crea avaluació<br/>POST /avaluacions
+
+    state oberta {
+        direction LR
+        o_desc: PERÍODE DE CONFIGURACIÓ
+        o_perms: ✓ Admin pot editar estructura<br/>✗ Cap docent pot introduir notes<br/>✗ Cap tutor pot editar
+        o_desc --> o_perms
+    }
+
+    state docent {
+        direction LR
+        d_desc: INTRODUCCIÓ DE NOTES PER DOCENT
+        d_perms: ✓ Profe amb assignacio_docent<br/>edita notes per RA del seu mòdul<br/>✗ Tutor no pot editar encara<br/>✓ Admin pot editar tot
+        d_desc --> d_perms
+    }
+
+    state junta {
+        direction LR
+        j_desc: SESSIÓ DE JUNTA D'AVALUACIÓ
+        j_perms: ✓ Tutor del grup pot editar<br/>notes per RA i nota final manual<br/>✓ Admin pot editar tot<br/>✗ Profes sense tutoria, només lectura
+        j_desc --> j_perms
+    }
+
+    state tancada {
+        direction LR
+        t_desc: AVALUACIÓ TANCADA
+        t_perms: ✗ Ningú edita notes<br/>✓ Generació butlletins<br/>✓ Enviament emails<br/>✓ Arxivat permanent
+        t_desc --> t_perms
+    }
+
+    oberta --> docent : admin avança<br/>POST /avaluacions/:id/transition<br/>{target: docent}
+    docent --> junta : admin avança<br/>{target: junta}
+    junta --> tancada : admin avança<br/>{target: tancada}<br/>set data_tancament
+
+    docent --> oberta : admin rollback<br/>{target: oberta}<br/>correcció estructura
+    junta --> docent : admin rollback<br/>{target: docent}<br/>més notes per profes
+    tancada --> junta : admin rollback<br/>{target: junta}<br/>clear data_tancament
+
+    tancada --> [*] : Història preservada<br/>(arxiu permanent)
+
+    note right of oberta
+        Salt només a estat adjacent.
+        Cap transició salta nivells.
+        Tots els canvis queden a audit_logs
+        amb actor + before/after.
+    end note
+
+    note left of tancada
+        Genera butlletins PDF
+        amb WeasyPrint + envia
+        per email als tutors legals.
+        Conserva totes les notes
+        per consultes històriques.
+    end note

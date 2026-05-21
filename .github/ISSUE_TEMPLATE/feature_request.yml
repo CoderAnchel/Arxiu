@@ -1,0 +1,52 @@
+name: ✨ Feature request
+description: Proposa una nova funcionalitat o millora.
+title: "[Feature] "
+labels: ["enhancement", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Gràcies per la idea! Explica què t'agradaria fer i per què.
+
+  - type: textarea
+    id: problema
+    attributes:
+      label: Quin problema resol?
+      description: Quina necessitat o pain point intentes resoldre?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposta
+    attributes:
+      label: Solució proposada
+      description: Com t'imagines que hauria de funcionar?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considerades
+      description: Has pensat en altres maneres de fer-ho?
+
+  - type: dropdown
+    id: impacte
+    attributes:
+      label: A qui afecta principalment?
+      multiple: true
+      options:
+        - Admin / Cap d'estudis
+        - Professor
+        - Tutor
+        - Família (futur)
+        - Alumne (futur)
+        - Manteniment del sistema
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context addicional
+      description: Captures, enllaços, exemples d'altres sistemes que ho facin bé.

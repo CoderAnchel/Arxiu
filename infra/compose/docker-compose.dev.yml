@@ -1,0 +1,63 @@
+# Development overrides — hot-reload, exposed ports, MailHog, debug logging.
+
+services:
+  mysql:
+    ports:
+      - "3306:3306"               # exposed for local SQL clients
+
+  redis:
+    ports:
+      - "6379:6379"
+
+  backend:
+    build:
+      target: dev
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--reload-dir", "/app/app"]
+    environment:
+      LOG_LEVEL: DEBUG
+    volumes:
+      - ../../apps/backend/app:/app/app
+      - ../../apps/backend/alembic:/app/alembic
+      - ../../apps/backend/alembic.ini:/app/alembic.ini
+      - ../../apps/backend/pyproject.toml:/app/pyproject.toml
+      - ../../apps/backend/tests:/app/tests
+    ports:
+      - "8000:8000"
+
+  worker:
+    build:
+      target: dev
+    volumes:
+      - ../../apps/backend/app:/app/app
+    environment:
+      LOG_LEVEL: DEBUG
+
+  frontend:
+    build:
+      target: dev
+    command: ["pnpm", "dev", "--host", "0.0.0.0"]
+    volumes:
+      - ../../apps/frontend/src:/app/src
+      - ../../apps/frontend/public:/app/public
+      - ../../apps/frontend/index.html:/app/index.html
+      - ../../apps/frontend/vite.config.ts:/app/vite.config.ts
+      - ../../apps/frontend/tsconfig.json:/app/tsconfig.json
+      - ../../apps/frontend/package.json:/app/package.json
+      - frontend-node-modules:/app/node_modules
+    ports:
+      - "5173:5173"
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    platform: linux/amd64           # explicit — runs via Rosetta on Apple Silicon
+    ports:
+      # Host-side ports raised to avoid conflicts with other local SMTP tools.
+      # The backend still talks to mailhog:1025 over the internal Docker network,
+      # so this only affects how YOU as developer reach MailHog from your Mac.
+      - "11025:1025"                # SMTP   — open Telnet/etc. to localhost:11025
+      - "18025:8025"                # Web UI — http://localhost:18025
+    networks:
+      - backend-net
+
+volumes:
+  frontend-node-modules:

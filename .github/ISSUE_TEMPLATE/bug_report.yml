@@ -1,0 +1,72 @@
+name: 🐛 Bug report
+description: Reporta un comportament incorrecte de l'aplicació.
+title: "[Bug] "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Gràcies per reportar el problema. Omple les seccions perquè puguem reproduir-ho.
+
+  - type: textarea
+    id: descripcio
+    attributes:
+      label: Descripció
+      description: Què passa? Què esperaves que passés?
+      placeholder: Quan faig X, espero Y, però passa Z.
+    validations:
+      required: true
+
+  - type: textarea
+    id: passos
+    attributes:
+      label: Passos per reproduir
+      description: Llista numerada dels passos exactes.
+      placeholder: |
+        1. Login amb usuari …
+        2. Vaig a /qualificacions
+        3. Selecciono grup DAM1A
+        4. Veig l'error …
+    validations:
+      required: true
+
+  - type: dropdown
+    id: rol
+    attributes:
+      label: Rol de l'usuari afectat
+      options:
+        - Admin
+        - Professor (sense assignació)
+        - Professor amb assignació al mòdul
+        - Tutor del grup
+        - No autenticat
+    validations:
+      required: true
+
+  - type: dropdown
+    id: entorn
+    attributes:
+      label: Entorn
+      options:
+        - Desenvolupament local (make dev)
+        - Servidor Windows del centre
+        - Altres
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / captures
+      description: Adjunta logs del backend, frontend o captures si en tens.
+      render: shell
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Comprovacions prèvies
+      options:
+        - label: He cercat issues existents i no és un duplicat
+          required: true
+        - label: No he inclòs cap credencial, contrasenya o dada real d'alumne al report
+          required: true

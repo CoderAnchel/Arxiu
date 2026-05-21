@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📚 Documentació
+    url: https://github.com/CoderAnchel/Arxiu/blob/main/README.md
+    about: Abans d'obrir una incidència, consulta el README, ARCHITECTURE i SECURITY.
+  - name: 🚀 Guia de desplegament
+    url: https://github.com/CoderAnchel/Arxiu/blob/main/DEPLOYMENT.md
+    about: Per a preguntes sobre instal·lació o configuració del servidor.

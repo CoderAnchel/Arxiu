@@ -1,0 +1,6 @@
+# CODEOWNERS — automatic review request for every change.
+#
+# Replace @CoderAnchel with your GitHub handle after first push so PRs get
+# routed to you automatically.
+
+*       @CoderAnchel

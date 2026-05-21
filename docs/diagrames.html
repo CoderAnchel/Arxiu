@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="ca">
+  <head>
+    <meta charset="utf-8" />
+    <title>Arxiu de notes — Diagrames</title>
+    <style>
+      :root {
+        --bg: #faf8f3;
+        --ink: #2a2724;
+        --ink-2: #6c6862;
+        --accent: #2f7a41;
+        --line: #d8d3c8;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        padding: 32px;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+      }
+      .wrap { max-width: 1600px; margin: 0 auto; }
+      header.page-head {
+        margin-bottom: 32px;
+      }
+      .eyebrow {
+        font-family: ui-monospace, "JetBrains Mono", monospace;
+        font-size: 11px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--ink-2);
+        margin: 0 0 4px;
+      }
+      h1 {
+        margin: 0 0 4px;
+        font-family: ui-serif, "Iowan Old Style", Georgia, serif;
+        font-style: italic;
+        font-size: 36px;
+      }
+      .sub {
+        margin: 0;
+        color: var(--ink-2);
+        font-size: 14px;
+        max-width: 900px;
+        line-height: 1.5;
+      }
+      section.diagram {
+        background: white;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 24px;
+        margin: 0 0 28px;
+        overflow-x: auto;
+      }
+      section.diagram h2 {
+        margin: 0 0 4px;
+        font-family: ui-serif, "Iowan Old Style", Georgia, serif;
+        font-style: italic;
+        font-size: 26px;
+      }
+      section.diagram p {
+        margin: 0 0 18px;
+        color: var(--ink-2);
+        font-size: 13.5px;
+        line-height: 1.55;
+      }
+      .legend {
+        display: flex;
+        gap: 22px;
+        margin: 8px 0 0;
+        font-size: 12px;
+        color: var(--ink-2);
+      }
+      .legend strong { color: var(--ink); font-weight: 600; }
+      .mermaid { display: block; }
+      footer {
+        margin: 24px 0 0;
+        font-family: ui-monospace, "JetBrains Mono", monospace;
+        font-size: 11px;
+        color: var(--ink-2);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="page-head">
+        <p class="eyebrow">Arxiu de notes · Institut la Ferreria</p>
+        <h1>Diagrames tècnics</h1>
+        <p class="sub">
+          Tres vistes complementàries: el model de dades relacional (MySQL),
+          el flux de creació d'un compte amb totes les validacions, i la màquina
+          d'estats que governa cada avaluació al llarg del curs.
+        </p>
+      </header>
+
+      <!-- ============================================================ -->
+      <section class="diagram">
+        <h2>1 · Model de dades</h2>
+        <p>
+          Esquema relacional MySQL 8.0. Soft delete a totes les entitats acadèmiques
+          (camp <code>deleted_at</code>) — l'arxiu és permanent: cap registre no
+          s'elimina mai, només es marca com a no actiu. Les notes per RA i la nota
+          final del mòdul viuen en taules separades perquè la nota final pot ser
+          una mitjana automàtica ponderada o una sobreescriptura manual del docent.
+        </p>
+        <div class="legend">
+          <span><strong>PK</strong> primary key</span>
+          <span><strong>FK</strong> foreign key</span>
+          <span><strong>UK</strong> unique key</span>
+          <span><strong>||--o{</strong> relació un-a-molts</span>
+        </div>
+        <pre class="mermaid">
+erDiagram
+    USERS ||--o{ ASSIGNACIONS_DOCENTS : "imparteix"
+    USERS ||--o{ GRUPS_CLASSE : "tutoritza"
+    USERS ||--o{ AUDIT_LOGS : "fa accions"
+    FAMILIES_PROFESSIONALS ||--o{ CICLES : "agrupa"
+    CICLES ||--o{ MODULS : "conté"
+    CICLES ||--o{ GRUPS_CLASSE : "instancia"
+    CICLES ||--o{ MATRICULES : "matricula a"
+    MODULS ||--o{ RAS : "es divideix en"
+    MODULS ||--o{ ASSIGNACIONS_DOCENTS : "assignat a"
+    MODULS ||--o{ QUALIFICACIONS_MODUL : "nota final"
+    CURSOS_ACADEMICS ||--o{ GRUPS_CLASSE : "any escolar"
+    CURSOS_ACADEMICS ||--o{ MATRICULES : "any escolar"
+    CURSOS_ACADEMICS ||--o{ ASSIGNACIONS_DOCENTS : "any escolar"
+    CURSOS_ACADEMICS ||--o{ AVALUACIONS : "any escolar"
+    ALUMNES ||--o{ TUTORS_LEGALS : "té"
+    ALUMNES ||--o{ MATRICULES : "es matricula"
+    ALUMNES ||--o{ ENVIAMENTS : "rep"
+    GRUPS_CLASSE ||--o{ MATRICULES : "agrupa"
+    GRUPS_CLASSE ||--o{ ASSIGNACIONS_DOCENTS : "té docents"
+    MATRICULES ||--o{ QUALIFICACIONS_RA : "té notes"
+    MATRICULES ||--o{ QUALIFICACIONS_MODUL : "té nota final"
+    RAS ||--o{ QUALIFICACIONS_RA : "es qualifica"
+    AVALUACIONS ||--o{ QUALIFICACIONS_RA : "període"
+    AVALUACIONS ||--o{ QUALIFICACIONS_MODUL : "període"
+
+    USERS { bigint id PK; string dni UK; string email UK; string password_hash; bool must_change_password; enum role; string nom; string cognoms; string departament; bool active; string mfa_secret; datetime last_login_at; datetime deleted_at }
+    FAMILIES_PROFESSIONALS { bigint id PK; string codi UK; string nom; datetime deleted_at }
+    CICLES { bigint id PK; string codi UK; string nom; bigint familia_id FK; enum nivell; int durada; datetime deleted_at }
+    MODULS { bigint id PK; bigint cicle_id FK; string codi; string nom; int curs; int hores; datetime deleted_at }
+    RAS { bigint id PK; bigint modul_id FK; int ordre; string codi; text descripcio; decimal pes; datetime deleted_at }
+    CURSOS_ACADEMICS { bigint id PK; string nom UK; bool actiu; date data_inici; date data_fi }
+    ALUMNES { bigint id PK; string ralc UK; string dni; string nom; string cognoms; string email; string telefon; date data_naixement; datetime deleted_at }
+    TUTORS_LEGALS { bigint id PK; bigint alumne_id FK; string nom; string email; string telefon }
+    GRUPS_CLASSE { bigint id PK; string codi; bigint curs_acad_id FK; bigint cicle_id FK; int curs; bigint tutor_user_id FK; datetime deleted_at }
+    MATRICULES { bigint id PK; bigint alumne_id FK; bigint grup_id FK; bigint cicle_id FK; bigint curs_acad_id FK; int curs; enum tipus; enum estat; datetime deleted_at }
+    ASSIGNACIONS_DOCENTS { bigint id PK; bigint user_id FK; bigint grup_id FK; bigint modul_id FK; bigint curs_acad_id FK; datetime deleted_at }
+    AVALUACIONS { bigint id PK; bigint curs_acad_id FK; string nom; int ordre; enum estat; date data_inici; date data_tancament; datetime deleted_at }
+    QUALIFICACIONS_RA { bigint id PK; bigint matricula_id FK; bigint ra_id FK; bigint avaluacio_id FK; decimal nota; text comentari; bigint professor_user_id FK; datetime updated_at }
+    QUALIFICACIONS_MODUL { bigint id PK; bigint matricula_id FK; bigint modul_id FK; bigint avaluacio_id FK; decimal nota; text comentari; bigint professor_user_id FK; datetime updated_at }
+    ENVIAMENTS { bigint id PK; bigint alumne_id FK; string destinatari_email; enum tipus; string assumpte; enum estat; datetime queued_at; datetime sent_at; datetime opened_at }
+    IMPORTS { bigint id PK; enum tipus; string fitxer_path; bigint user_id FK; int total; int ok; int errors; json log; enum estat; datetime created_at; datetime completed_at }
+    AUDIT_LOGS { bigint id PK; bigint user_id FK; string action; string entity; string entity_id; json before; json after; string ip; string user_agent; datetime created_at }
+        </pre>
+      </section>
+
+      <!-- ============================================================ -->
+      <section class="diagram">
+        <h2>2 · Validacions per crear un usuari</h2>
+        <p>
+          L'admin crea un docent des de la UI. El sistema genera una contrasenya
+          forta i la mostra <strong>una sola vegada</strong>; el receptor la rep
+          per email o manualment. Al primer accés és obligat canviar-la.
+          Cada pas valida les invariants i deixa rastre a <code>audit_logs</code>.
+        </p>
+        <pre class="mermaid">
+flowchart TD
+    Start([Admin obre /docents]) --> NewBtn[Clica + Nou docent]
+    NewBtn --> Form["Modal: DNI, email, nom,<br/>cognoms, rol, departament"]
+    Form --> Submit[POST /api/v1/admin/users]
+    Submit --> AuthCheck{Token vàlid<br/>i rol = admin?}
+    AuthCheck -->|no| Err403["403 permission_denied"]
+    AuthCheck -->|sí| ValDni{DNI format<br/>i unicitat}
+    ValDni -->|invàlid| Err422["422 validation_error"]
+    ValDni -->|duplicat| Err409["409 conflict<br/>DNI o email existeix"]
+    ValDni -->|ok| GenPwd[Genera contrasenya<br/>16 chars · alfanumèric + símbols]
+    GenPwd --> Hash[bcrypt cost 12<br/>password_hash]
+    Hash --> Insert[("INSERT users<br/>must_change_password = TRUE<br/>password_set_at = now")]
+    Insert --> Audit[("INSERT audit_logs<br/>action = user_created")]
+    Audit --> RedisCache[("SET Redis 5min<br/>pwd:user_id → plaintext")]
+    RedisCache --> Resp["201 Created<br/>+ generated_password (reveal-once)"]
+    Resp --> Modal["Modal: contrasenya<br/>visible 1 cop"]
+    Modal --> Choice{Admin tria}
+    Choice -->|Copiar| Manual[Comparteix manualment]
+    Choice -->|Email| Send[POST /admin/users/:id/email-password]
+    Send --> RedisGet{Redis TTL<br/>encara vàlid?}
+    RedisGet -->|no| Regen["Cal regenerar<br/>contrasenya"]
+    RedisGet -->|sí| Smtp[aiosmtplib<br/>plantilla Jinja2]
+    Smtp --> Sent[Email enviat<br/>+ audit log]
+    Manual --> FirstLogin([Usuari rep credencials])
+    Sent --> FirstLogin
+    FirstLogin --> Login[POST /auth/login<br/>identifier + password]
+    Login --> Match{password OK?}
+    Match -->|no| Err401["401 invalid_credentials<br/>rate limit 5/min"]
+    Match -->|sí| FlagCheck{must_change<br/>_password?}
+    FlagCheck -->|sí| ShortToken[Token curt<br/>scope: change-password]
+    FlagCheck -->|no| FullToken[Access + refresh<br/>complets]
+    ShortToken --> Redir["Frontend: redirect<br/>/change-password"]
+    Redir --> NewForm["Form: nova contrasenya<br/>+ confirmació"]
+    NewForm --> Validate{Min 12 chars<br/>zxcvbn score ≥ 3}
+    Validate -->|feble| Reject["422 password_weak"]
+    Validate -->|fort| Save[("UPDATE users<br/>must_change_password = FALSE")]
+    Save --> AuditChange[("INSERT audit_logs<br/>password_changed")]
+    AuditChange --> NewSession[Emet token complet<br/>+ refresh cookie]
+    NewSession --> Dashboard([Accés al dashboard])
+    FullToken --> Dashboard
+
+    classDef ok fill:#e8f3eb,stroke:#2f7a41,color:#1a3d22
+    classDef err fill:#fbe8e6,stroke:#b5453e,color:#5a1e1c
+    classDef store fill:#f5f1e8,stroke:#6c6862,color:#2a2724
+    class Resp,Sent,Dashboard,NewSession,FullToken,ShortToken ok
+    class Err403,Err409,Err422,Err401,Reject,Regen err
+    class Insert,Audit,RedisCache,Save,AuditChange store
+        </pre>
+      </section>
+
+      <!-- ============================================================ -->
+      <section class="diagram">
+        <h2>3 · Estats d'una avaluació</h2>
+        <p>
+          Cada avaluació passa per quatre fases. Només l'admin pot avançar o
+          desfer transicions, i només a estats adjacents — mai es salten nivells.
+          Cada estat habilita un conjunt de permisos diferents per a docents,
+          tutors i admin. Totes les transicions queden a <code>audit_logs</code>
+          amb actor, abans i després.
+        </p>
+        <pre class="mermaid">
+stateDiagram-v2
+    [*] --> oberta : Admin crea avaluació<br/>POST /avaluacions
+
+    oberta : oberta — PERÍODE DE CONFIGURACIÓ\n✓ Admin edita estructura\n✗ Cap docent introdueix notes\n✗ Tutor només lectura
+    docent : docent — INTRODUCCIÓ DE NOTES\n✓ Profe amb assignacio_docent edita RA\n✗ Tutor encara no edita\n✓ Admin pot editar tot
+    junta  : junta — JUNTA D'AVALUACIÓ\n✓ Tutor edita RA + nota final manual\n✓ Admin pot editar tot\n✗ Profes sense tutoria, lectura
+    tancada: tancada — TANCADA\n✗ Ningú edita notes\n✓ Generació butlletins PDF\n✓ Enviament d'emails\n✓ Arxivat permanent
+
+    oberta --> docent : admin avança\nPOST /avaluacions/:id/transition\n{target: docent}
+    docent --> junta : admin avança\n{target: junta}
+    junta --> tancada : admin avança\n{target: tancada}\nset data_tancament
+
+    docent --> oberta : admin rollback\n{target: oberta}\ncorrecció estructura
+    junta --> docent : admin rollback\n{target: docent}\nmés notes per profes
+    tancada --> junta : admin rollback\n{target: junta}\nclear data_tancament
+
+    tancada --> [*] : Història preservada\n(arxiu permanent)
+        </pre>
+      </section>
+
+      <footer>
+        Tres diagrames generats des de <code>apps/backend/app/</code>.
+        Codi font Mermaid disponible a <code>docs/*.mmd</code>.
+      </footer>
+    </div>
+
+    <script type="module">
+      import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+      mermaid.initialize({
+        startOnLoad: true,
+        theme: "base",
+        themeVariables: {
+          primaryColor: "#f5f1e8",
+          primaryTextColor: "#2a2724",
+          primaryBorderColor: "#6c6862",
+          lineColor: "#6c6862",
+          secondaryColor: "#e7e5e0",
+          tertiaryColor: "#faf8f3",
+          fontFamily:
+            'ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif',
+        },
+        er: { layoutDirection: "TB", entityPadding: 14, useMaxWidth: false },
+        flowchart: { useMaxWidth: false, htmlLabels: true, curve: "basis" },
+        state: { useMaxWidth: false },
+      });
+    </script>
+  </body>
+</html>

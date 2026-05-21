@@ -1,0 +1,64 @@
+# Node
+node_modules/
+dist/
+build/
+.pnpm-store/
+*.tsbuildinfo
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+.tox/
+
+# uv / poetry
+uv.lock
+poetry.lock
+.python-version
+
+# Vite / Vitest
+.vite/
+.vitest/
+coverage/
+
+# Playwright
+playwright-report/
+test-results/
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+
+# Env / secrets
+.env
+.env.local
+.env.*.local
+.env.production
+secrets/
+*.pem
+*.key
+seed_credentials.csv
+
+# Build artifacts / uploads
+uploads/
+backups/
+*.log
+storage/
+
+# Docker
+docker-compose.override.yml

@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="ca">
+  <head>
+    <meta charset="utf-8" />
+    <title>Arxiu de notes — Model de dades</title>
+    <style>
+      :root {
+        --bg: #faf8f3;
+        --ink: #2a2724;
+        --ink-2: #6c6862;
+        --accent: #2f7a41;
+        --line: #d8d3c8;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        padding: 32px;
+        background: var(--bg);
+        color: var(--ink);
+        font-family:
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          "Segoe UI",
+          sans-serif;
+      }
+      header {
+        max-width: 1600px;
+        margin: 0 auto 24px;
+      }
+      header .eyebrow {
+        font-family: ui-monospace, "JetBrains Mono", monospace;
+        font-size: 11px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--ink-2);
+        margin: 0 0 4px;
+      }
+      h1 {
+        margin: 0 0 4px;
+        font-family: ui-serif, "Iowan Old Style", Georgia, serif;
+        font-style: italic;
+        font-size: 36px;
+      }
+      .sub {
+        margin: 0;
+        color: var(--ink-2);
+        font-size: 14px;
+        max-width: 900px;
+        line-height: 1.5;
+      }
+      .legend {
+        display: flex;
+        gap: 22px;
+        margin: 14px 0 0;
+        font-size: 12px;
+        color: var(--ink-2);
+      }
+      .legend strong {
+        color: var(--ink);
+        font-weight: 600;
+      }
+      main {
+        max-width: 1600px;
+        margin: 0 auto;
+        background: white;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 24px;
+        overflow-x: auto;
+      }
+      .mermaid {
+        display: block;
+      }
+      footer {
+        max-width: 1600px;
+        margin: 16px auto 0;
+        font-family: ui-monospace, "JetBrains Mono", monospace;
+        font-size: 11px;
+        color: var(--ink-2);
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <p class="eyebrow">Arxiu de notes · Institut la Ferreria</p>
+      <h1>Model de dades</h1>
+      <p class="sub">
+        Esquema relacional MySQL 8.0. Soft delete a totes les entitats acadèmiques
+        (camp <code>deleted_at</code>) — l'arxiu és permanent: cap registre no s'elimina
+        mai, només es marca com a no actiu. Les notes per RA i la nota final del mòdul
+        viuen en taules separades perquè la nota final pot ser una mitjana automàtica
+        ponderada o una sobreescriptura manual del docent.
+      </p>
+      <div class="legend">
+        <span><strong>PK</strong> primary key</span>
+        <span><strong>FK</strong> foreign key</span>
+        <span><strong>UK</strong> unique key</span>
+        <span><strong>||--o{</strong> relació un-a-molts</span>
+      </div>
+    </header>
+
+    <main>
+      <pre class="mermaid">
+erDiagram
+    USERS ||--o{ ASSIGNACIONS_DOCENTS : "imparteix"
+    USERS ||--o{ GRUPS_CLASSE : "tutoritza"
+    USERS ||--o{ AUDIT_LOGS : "fa accions"
+
+    FAMILIES_PROFESSIONALS ||--o{ CICLES : "agrupa"
+    CICLES ||--o{ MODULS : "conté"
+    CICLES ||--o{ GRUPS_CLASSE : "instancia"
+    CICLES ||--o{ MATRICULES : "matricula a"
+    MODULS ||--o{ RAS : "es divideix en"
+    MODULS ||--o{ ASSIGNACIONS_DOCENTS : "assignat a"
+    MODULS ||--o{ QUALIFICACIONS_MODUL : "nota final"
+
+    CURSOS_ACADEMICS ||--o{ GRUPS_CLASSE : "any escolar"
+    CURSOS_ACADEMICS ||--o{ MATRICULES : "any escolar"
+    CURSOS_ACADEMICS ||--o{ ASSIGNACIONS_DOCENTS : "any escolar"
+    CURSOS_ACADEMICS ||--o{ AVALUACIONS : "any escolar"
+
+    ALUMNES ||--o{ TUTORS_LEGALS : "té"
+    ALUMNES ||--o{ MATRICULES : "es matricula"
+    ALUMNES ||--o{ ENVIAMENTS : "rep"
+
+    GRUPS_CLASSE ||--o{ MATRICULES : "agrupa"
+    GRUPS_CLASSE ||--o{ ASSIGNACIONS_DOCENTS : "té docents"
+
+    MATRICULES ||--o{ QUALIFICACIONS_RA : "té notes"
+    MATRICULES ||--o{ QUALIFICACIONS_MODUL : "té nota final"
+
+    RAS ||--o{ QUALIFICACIONS_RA : "es qualifica"
+
+    AVALUACIONS ||--o{ QUALIFICACIONS_RA : "període"
+    AVALUACIONS ||--o{ QUALIFICACIONS_MODUL : "període"
+
+    USERS {
+        bigint id PK
+        string dni UK
+        string email UK
+        string password_hash
+        bool must_change_password
+        enum role "admin|professor"
+        string nom
+        string cognoms
+        string departament
+        bool active
+        string mfa_secret
+        datetime last_login_at
+        datetime deleted_at
+    }
+
+    FAMILIES_PROFESSIONALS {
+        bigint id PK
+        string codi UK
+        string nom
+        datetime deleted_at
+    }
+
+    CICLES {
+        bigint id PK
+        string codi UK
+        string nom
+        bigint familia_id FK
+        enum nivell "mig|superior"
+        int durada
+        datetime deleted_at
+    }
+
+    MODULS {
+        bigint id PK
+        bigint cicle_id FK
+        string codi
+        string nom
+        int curs
+        int hores
+        datetime deleted_at
+    }
+
+    RAS {
+        bigint id PK
+        bigint modul_id FK
+        int ordre
+        string codi
+        text descripcio
+        decimal pes
+        datetime deleted_at
+    }
+
+    CURSOS_ACADEMICS {
+        bigint id PK
+        string nom UK
+        bool actiu
+        date data_inici
+        date data_fi
+    }
+
+    ALUMNES {
+        bigint id PK
+        string ralc UK
+        string dni
+        string nom
+        string cognoms
+        string email
+        string telefon
+        date data_naixement
+        datetime deleted_at
+    }
+
+    TUTORS_LEGALS {
+        bigint id PK
+        bigint alumne_id FK
+        string nom
+        string email
+        string telefon
+    }
+
+    GRUPS_CLASSE {
+        bigint id PK
+        string codi
+        bigint curs_acad_id FK
+        bigint cicle_id FK
+        int curs
+        bigint tutor_user_id FK
+        datetime deleted_at
+    }
+
+    MATRICULES {
+        bigint id PK
+        bigint alumne_id FK
+        bigint grup_id FK
+        bigint cicle_id FK
+        bigint curs_acad_id FK
+        int curs
+        enum tipus "primari|secundari"
+        enum estat "actiu|finalitzat|baixa"
+        datetime deleted_at
+    }
+
+    ASSIGNACIONS_DOCENTS {
+        bigint id PK
+        bigint user_id FK
+        bigint grup_id FK
+        bigint modul_id FK
+        bigint curs_acad_id FK
+        datetime deleted_at
+    }
+
+    AVALUACIONS {
+        bigint id PK
+        bigint curs_acad_id FK
+        string nom
+        int ordre
+        enum estat "oberta|docent|junta|tancada"
+        date data_inici
+        date data_tancament
+        datetime deleted_at
+    }
+
+    QUALIFICACIONS_RA {
+        bigint id PK
+        bigint matricula_id FK
+        bigint ra_id FK
+        bigint avaluacio_id FK
+        decimal nota
+        text comentari
+        bigint professor_user_id FK
+        datetime updated_at
+    }
+
+    QUALIFICACIONS_MODUL {
+        bigint id PK
+        bigint matricula_id FK
+        bigint modul_id FK
+        bigint avaluacio_id FK
+        decimal nota
+        text comentari
+        bigint professor_user_id FK
+        datetime updated_at
+    }
+
+    ENVIAMENTS {
+        bigint id PK
+        bigint alumne_id FK
+        string destinatari_email
+        enum tipus
+        string assumpte
+        enum estat "queued|enviat|obert|rebotat|error"
+        datetime queued_at
+        datetime sent_at
+        datetime opened_at
+    }
+
+    IMPORTS {
+        bigint id PK
+        enum tipus "alumnes|matricules|notes"
+        string fitxer_path
+        bigint user_id FK
+        int total
+        int ok
+        int errors
+        json log
+        enum estat
+        datetime created_at
+        datetime completed_at
+    }
+
+    AUDIT_LOGS {
+        bigint id PK
+        bigint user_id FK
+        string action
+        string entity
+        string entity_id
+        json before
+        json after
+        string ip
+        string user_agent
+        datetime created_at
+    }
+      </pre>
+    </main>
+
+    <footer>
+      Generat des de <code>apps/backend/app/models/</code> — 18 entitats · MySQL 8.0 InnoDB · utf8mb4
+    </footer>
+
+    <script type="module">
+      import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+      mermaid.initialize({
+        startOnLoad: true,
+        theme: "base",
+        themeVariables: {
+          primaryColor: "#f5f1e8",
+          primaryTextColor: "#2a2724",
+          primaryBorderColor: "#6c6862",
+          lineColor: "#6c6862",
+          secondaryColor: "#e7e5e0",
+          tertiaryColor: "#faf8f3",
+          fontFamily: 'ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif',
+        },
+        er: { layoutDirection: "TB", entityPadding: 14, useMaxWidth: false },
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,310 @@
+.page {
+  padding: 28px 32px;
+  max-width: 1480px;
+}
+
+.head {
+  margin-bottom: 18px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.title {
+  margin: 0 0 6px;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 32px;
+  letter-spacing: -0.01em;
+}
+
+.sub {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 14px;
+}
+
+.actions {
+  margin-top: 14px;
+  display: flex;
+  gap: 8px;
+}
+
+.card {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  margin-bottom: 18px;
+  overflow: hidden;
+}
+
+.cardHead {
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--line-soft);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.kv {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 6px 16px;
+  margin: 0;
+  padding: 14px 18px;
+}
+
+.kv dt {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  align-self: center;
+}
+
+.kv dd {
+  margin: 0;
+  font-size: 13.5px;
+}
+
+.tutorsSection {
+  border-top: 1px solid var(--line-soft);
+}
+
+.tutorRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  padding: 10px 18px;
+  border-bottom: 1px solid var(--line-soft);
+  gap: 16px;
+  font-size: 13px;
+}
+
+.tutorRow:last-child {
+  border-bottom: 0;
+}
+
+.tutorNom {
+  font-weight: 500;
+}
+
+/* Matrícula card */
+.matrHead {
+  display: flex;
+  align-items: flex-start;
+  padding: 18px 22px 14px;
+  border-bottom: 1px solid var(--line-soft);
+  background: var(--bg-2);
+}
+
+.matrCurs {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+
+.matrTitle {
+  margin: 0 0 6px;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.matrSub {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.link {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.tag {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 2px 9px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.tagSm {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink-3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* Módul block */
+.modulBlock {
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.modulBlock:last-child {
+  border-bottom: 0;
+}
+
+.modulHead {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.mono {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-2);
+}
+
+.modulNom {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 17px;
+  flex: 1;
+}
+
+/* Notes table per modul */
+.notesGrid {
+  overflow-x: auto;
+}
+
+.notesTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+
+.notesTable thead th {
+  padding: 8px 10px;
+  background: var(--bg-2);
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  vertical-align: top;
+}
+
+.notesTable thead .colNum {
+  text-align: center;
+  min-width: 88px;
+}
+
+.notesTable thead .estat {
+  display: block;
+  margin-top: 2px;
+  color: var(--ink-3);
+  font-size: 9px;
+}
+
+.notesTable tbody tr {
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.notesTable tbody td {
+  padding: 8px 10px;
+  vertical-align: middle;
+}
+
+.notesTable tbody .colNum {
+  text-align: center;
+  font-family: var(--mono);
+}
+
+.raCodi {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--accent);
+}
+
+.raDesc {
+  font-size: 11.5px;
+  color: var(--ink-3);
+  margin-top: 2px;
+  max-width: 340px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.num {
+  font-weight: 500;
+  display: inline-block;
+  min-width: 36px;
+}
+
+.numEmpty {
+  color: var(--ink-3);
+}
+
+.numSusp {
+  color: var(--danger);
+}
+
+.numApr {
+  color: var(--accent);
+}
+
+.numExc {
+  color: var(--info);
+  font-weight: 600;
+}
+
+.summaryRow {
+  background: var(--bg-2);
+  font-weight: 500;
+}
+
+.summaryRow td:first-child {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.muted {
+  padding: 20px;
+  color: var(--ink-3);
+  font-size: 13px;
+  text-align: center;
+}
+
+.error {
+  padding: 20px;
+  color: var(--danger);
+  font-size: 13px;
+}

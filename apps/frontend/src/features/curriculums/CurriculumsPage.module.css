@@ -1,0 +1,347 @@
+.page {
+  padding: 28px 32px;
+  max-width: 1640px;
+}
+
+.head {
+  margin-bottom: 24px;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.title {
+  margin: 0 0 6px;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 32px;
+  letter-spacing: -0.01em;
+}
+
+.sub {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 14px;
+  max-width: 720px;
+  line-height: 1.55;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+.list {
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 8px;
+  position: sticky;
+  top: 76px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.listHead {
+  padding: 10px 12px 8px;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.listItem {
+  display: grid;
+  grid-template-columns: max-content 1fr max-content;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 12px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--r);
+  text-align: left;
+  font-size: 13px;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.listItem strong {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.listItem:hover {
+  background: var(--bg-3);
+}
+
+.listItemActive {
+  background: var(--accent-bg);
+  color: var(--accent);
+  border-color: color-mix(in oklab, var(--accent) 30%, transparent);
+}
+
+.detail {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 24px 28px;
+}
+
+.detailHead {
+  margin-bottom: 24px;
+}
+
+.detailHead h2 {
+  margin: 4px 0 0;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 26px;
+  letter-spacing: -0.005em;
+}
+
+.cursSection {
+  margin-bottom: 28px;
+}
+
+.cursSection h3 {
+  margin: 0 0 12px;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 18px;
+}
+
+.modulCard {
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r);
+  padding: 16px 20px;
+  margin-bottom: 12px;
+  background: var(--bg);
+}
+
+.modulHead {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.mono {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-3);
+  font-weight: 600;
+}
+
+.modulName {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 18px;
+  flex: 1;
+}
+
+.badge {
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 2px 9px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--ink-2);
+}
+
+.badgeOk {
+  background: color-mix(in oklab, var(--accent) 12%, var(--bg));
+  border-color: color-mix(in oklab, var(--accent) 35%, var(--line));
+  color: var(--accent);
+}
+
+.badgeWarn {
+  background: color-mix(in oklab, var(--danger) 14%, var(--bg));
+  border-color: color-mix(in oklab, var(--danger) 40%, var(--line));
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.raGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 10px;
+}
+
+.raCard {
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r);
+  padding: 10px 12px;
+  background: var(--bg-2);
+}
+
+.raHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 4px;
+}
+
+.raCodi {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.raPes {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--ink-3);
+}
+
+.raDesc {
+  font-size: 12.5px;
+  color: var(--ink-2);
+  line-height: 1.4;
+}
+
+.muted {
+  color: var(--ink-3);
+  padding: 16px;
+  font-size: 13px;
+}
+
+.error {
+  color: var(--danger);
+  padding: 16px;
+  font-size: 13px;
+}
+
+/* Toolbar / filters */
+.toolbar {
+  display: flex;
+  gap: 14px;
+  align-items: flex-end;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.toolbarField {
+  display: grid;
+  gap: 4px;
+}
+
+.toolbarField span {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.toolbarField input,
+.toolbarField select {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 6px 10px;
+  font-size: 12.5px;
+  color: var(--ink);
+  font-family: var(--sans);
+  outline: none;
+  min-width: 200px;
+}
+
+/* Detail head actions */
+.detailHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.detailActions {
+  display: flex;
+  gap: 8px;
+}
+
+.modulActions {
+  margin-left: auto;
+  display: flex;
+  gap: 6px;
+}
+
+.raActions {
+  display: inline-flex;
+  gap: 4px;
+  margin-left: 8px;
+}
+
+.raIconBtn {
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm, 6px);
+  color: var(--ink-2);
+  cursor: pointer;
+  font-size: 11px;
+  padding: 1px 6px;
+}
+
+.raIconBtn:hover {
+  background: var(--bg);
+  color: var(--ink);
+}
+
+/* Form modal grid */
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field.full {
+  grid-column: 1 / -1;
+}
+
+.field span {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.field input,
+.field select,
+.field textarea {
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 8px 12px;
+  font-size: 13.5px;
+  color: var(--ink);
+  font-family: var(--sans);
+  outline: none;
+  resize: vertical;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  border-color: var(--accent);
+  background: var(--bg);
+}

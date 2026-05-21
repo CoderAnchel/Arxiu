@@ -1,0 +1,94 @@
+# Production stack — Windows Server target.
+# - All secrets via Docker `secrets:` (file-mounted), not env vars.
+# - nginx reverse proxy terminates TLS and proxies /api/v1 to backend.
+# - MySQL volume is named + backed up nightly.
+
+services:
+  mysql:
+    restart: always
+    # No ports — only reachable via internal network.
+    environment:
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_password
+      MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
+    secrets:
+      - mysql_root_password
+      - mysql_password
+
+  redis:
+    restart: always
+
+  backend:
+    restart: always
+    build:
+      target: prod
+    environment:
+      WORKERS: "4"
+    secrets:
+      - jwt_private_key
+      - jwt_public_key
+
+  worker:
+    restart: always
+    build:
+      target: prod
+
+  frontend:
+    restart: always
+    build:
+      target: prod
+
+  nginx:
+    image: nginx:1.27-alpine
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ../nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ../nginx/security-headers.conf:/etc/nginx/security-headers.conf:ro
+      - letsencrypt:/etc/letsencrypt
+      - certbot-webroot:/var/www/certbot
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - frontend-net
+
+  certbot:
+    image: certbot/certbot:latest
+    restart: unless-stopped
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot --quiet; sleep 12h & wait $${!}; done"]
+    volumes:
+      - letsencrypt:/etc/letsencrypt
+      - certbot-webroot:/var/www/certbot
+
+  backup:
+    image: mysql:8.0
+    restart: unless-stopped
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["while :; do sleep 86400 & wait $${!}; mysqldump -h mysql -u root -p\"$$(cat /run/secrets/mysql_root_password)\" --single-transaction --routines arxiu | gzip > /backups/arxiu-$$(date +%Y%m%d).sql.gz; find /backups -name '*.sql.gz' -mtime +30 -delete; done"]
+    volumes:
+      - backups:/backups
+    secrets:
+      - mysql_root_password
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - backend-net
+
+secrets:
+  mysql_root_password:
+    file: ../../secrets/mysql_root_password
+  mysql_password:
+    file: ../../secrets/mysql_password
+  jwt_private_key:
+    file: ../../secrets/jwt_private.pem
+  jwt_public_key:
+    file: ../../secrets/jwt_public.pem
+
+volumes:
+  letsencrypt:
+  certbot-webroot:
+  backups:

@@ -1,0 +1,242 @@
+.page {
+  padding: 28px 32px;
+  max-width: 1480px;
+}
+
+.head {
+  margin-bottom: 18px;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.title {
+  margin: 0 0 6px;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 32px;
+  letter-spacing: -0.01em;
+}
+
+.sub {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 14px;
+  max-width: 720px;
+  line-height: 1.55;
+}
+
+/* stats */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.statCard {
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 16px 20px;
+}
+
+.statLabel {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.statValue {
+  margin-top: 6px;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 30px;
+  letter-spacing: -0.01em;
+}
+
+.accent_info {
+  color: var(--info);
+}
+
+.accent_green {
+  color: var(--accent);
+}
+
+.accent_warn {
+  color: var(--warn);
+}
+
+.accent_danger {
+  color: var(--danger);
+}
+
+/* toolbar */
+.toolbar {
+  margin-bottom: 14px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--ink-2);
+  font-family: var(--mono);
+  text-transform: lowercase;
+}
+
+.chipActive {
+  background: var(--accent-bg);
+  border-color: color-mix(in oklab, var(--accent) 30%, var(--line));
+  color: var(--accent);
+}
+
+/* table */
+.tableWrap {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table thead th {
+  text-align: left;
+  padding: 12px 16px;
+  background: var(--bg-2);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  border-bottom: 1px solid var(--line);
+}
+
+.table tbody tr {
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.table tbody tr:hover {
+  background: var(--bg-2);
+}
+
+.table tbody td {
+  padding: 10px 16px;
+  font-size: 13px;
+  color: var(--ink);
+}
+
+.mono {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--ink-2);
+}
+
+.tag {
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 2px 9px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--ink-2);
+}
+
+/* estat tags — colour-coded */
+.estatTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.estat_enviat {
+  background: color-mix(in oklab, var(--info) 12%, var(--bg));
+  color: var(--info);
+}
+
+.estat_obert {
+  background: color-mix(in oklab, var(--accent) 12%, var(--bg));
+  color: var(--accent);
+}
+
+.estat_rebotat {
+  background: color-mix(in oklab, var(--warn) 12%, var(--bg));
+  color: var(--warn);
+}
+
+.estat_error {
+  background: color-mix(in oklab, var(--danger) 12%, var(--bg));
+  color: var(--danger);
+}
+
+.estat_queued {
+  background: var(--bg-3);
+  color: var(--ink-3);
+}
+
+.muted {
+  padding: 32px;
+  text-align: center;
+  color: var(--ink-3);
+  font-size: 13px;
+}
+
+/* detail modal */
+.kv {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 8px 16px;
+  margin: 0;
+}
+
+.kv dt {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  align-self: center;
+}
+
+.kv dd {
+  margin: 0;
+  font-size: 13px;
+}
+
+.errorMsg {
+  padding: 8px 12px;
+  background: color-mix(in oklab, var(--danger) 10%, var(--bg-2));
+  border: 1px solid color-mix(in oklab, var(--danger) 30%, var(--line));
+  border-radius: var(--r);
+  color: var(--danger);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  line-height: 1.5;
+}

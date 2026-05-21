@@ -1,0 +1,51 @@
+/* Design tokens — lifted from the mockup styles.css.
+ * Theme files in ./themes/ override these variables via [data-theme] selectors on <html>.
+ * Density variables (row height, padding) overridden via [data-density].
+ */
+
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&display=swap");
+
+:root {
+  /* Default theme = clar (academic modern light) */
+  --bg: oklch(0.992 0.004 80);
+  --bg-2: oklch(0.978 0.005 80);
+  --bg-3: oklch(0.955 0.006 80);
+  --line: oklch(0.90 0.006 80);
+  --line-soft: oklch(0.94 0.005 80);
+  --ink: oklch(0.20 0.012 280);
+  --ink-2: oklch(0.42 0.010 280);
+  --ink-3: oklch(0.62 0.010 280);
+  --accent: oklch(0.50 0.13 145);
+  --accent-bg: oklch(0.95 0.04 145);
+  --warn: oklch(0.62 0.16 60);
+  --warn-bg: oklch(0.95 0.05 80);
+  --danger: oklch(0.55 0.18 25);
+  --danger-bg: oklch(0.95 0.04 25);
+  --info: oklch(0.55 0.13 250);
+  --info-bg: oklch(0.95 0.03 250);
+
+  /* Typography */
+  --serif: "Instrument Serif", "Georgia", serif;
+  --sans: "Inter", -apple-system, system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, monospace;
+
+  /* Radius */
+  --r-sm: 4px;
+  --r: 6px;
+  --r-lg: 10px;
+
+  /* Density (overridable via [data-density]) */
+  --row-h: 32px;
+  --pad: 16px;
+}
+
+/* ---------- Density modifiers ---------- */
+[data-density="dens"] {
+  --row-h: 28px;
+  --pad: 12px;
+}
+
+[data-density="comode"] {
+  --row-h: 40px;
+  --pad: 20px;
+}

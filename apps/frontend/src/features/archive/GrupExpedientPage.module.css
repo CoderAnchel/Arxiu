@@ -1,0 +1,205 @@
+.page {
+  padding: 28px 32px;
+  max-width: 1480px;
+}
+
+.head {
+  margin-bottom: 18px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.title {
+  margin: 0 0 6px;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 36px;
+  letter-spacing: -0.01em;
+}
+
+.sub {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 14px;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.tag {
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 12px;
+  color: var(--ink-2);
+}
+
+.tag strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.tagWarn {
+  background: color-mix(in oklab, var(--warn) 12%, var(--bg-2));
+  border-color: color-mix(in oklab, var(--warn) 30%, var(--line));
+  color: var(--warn);
+}
+
+.tagLink {
+  cursor: pointer;
+  text-decoration: none;
+  transition: border-color 120ms ease, color 120ms ease;
+}
+
+.tagLink:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.tagLink:hover strong {
+  color: var(--accent);
+}
+
+.tag_actiu {
+  background: color-mix(in oklab, var(--accent) 10%, var(--bg-2));
+  color: var(--accent);
+  border-color: color-mix(in oklab, var(--accent) 30%, var(--line));
+}
+
+.tag_finalitzat {
+  background: color-mix(in oklab, var(--info) 10%, var(--bg-2));
+  color: var(--info);
+}
+
+.tag_baixa {
+  background: color-mix(in oklab, var(--danger) 10%, var(--bg-2));
+  color: var(--danger);
+}
+
+.actions {
+  margin-top: 14px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.card {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+}
+
+.cardHead {
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table thead th {
+  text-align: left;
+  padding: 10px 14px;
+  background: var(--bg-2);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  border-bottom: 1px solid var(--line);
+}
+
+.table tbody tr {
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.table tbody tr:hover {
+  background: var(--bg-2);
+}
+
+.table tbody td {
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--ink);
+}
+
+.name {
+  font-weight: 500;
+}
+
+.mono {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--ink-2);
+}
+
+.estatTag {
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.estat_actiu {
+  background: color-mix(in oklab, var(--accent) 12%, var(--bg));
+  color: var(--accent);
+}
+
+.estat_finalitzat {
+  background: color-mix(in oklab, var(--info) 12%, var(--bg));
+  color: var(--info);
+}
+
+.estat_baixa {
+  background: color-mix(in oklab, var(--danger) 12%, var(--bg));
+  color: var(--danger);
+}
+
+.link {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.muted {
+  padding: 32px;
+  text-align: center;
+  color: var(--ink-3);
+  font-size: 13px;
+}
+
+.error {
+  padding: 20px;
+  color: var(--danger);
+  font-size: 13px;
+}

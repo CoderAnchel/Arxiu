@@ -1,0 +1,150 @@
+name: Security audit
+
+on:
+  schedule:
+    # Cada dilluns a les 06:00 UTC (07:00 Madrid hivern / 08:00 estiu)
+    - cron: "0 6 * * 1"
+  workflow_dispatch:  # permet disparar-lo manualment des de la UI de GitHub
+
+permissions:
+  contents: read
+  security-events: write   # per pujar resultats de Trivy a la pestanya Security
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  # ============================================================================
+  # Python dependencies — pip-audit comprova el llistat resolt contra la
+  # base de dades de vulnerabilitats (PyPI Advisory).
+  # ============================================================================
+  pip-audit:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v4
+        with:
+          version: "0.5.11"
+
+      - run: uv python install 3.12
+
+      - name: Install deps
+        run: uv pip install --system ".[dev]"
+
+      - name: pip-audit
+        run: pip-audit --strict --format markdown > pip-audit.md || true
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pip-audit
+          path: apps/backend/pip-audit.md
+
+  # ============================================================================
+  # JS dependencies
+  # ============================================================================
+  npm-audit:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+          cache-dependency-path: apps/frontend/pnpm-lock.yaml
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: pnpm audit
+        run: pnpm audit --audit-level=high --json > pnpm-audit.json || true
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pnpm-audit
+          path: apps/frontend/pnpm-audit.json
+
+  # ============================================================================
+  # Container image scanning amb Trivy. Construeix les imatges de prod i les
+  # escaneja per vulnerabilitats de SO i de package managers.
+  # ============================================================================
+  trivy-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: apps/backend
+          target: prod
+          push: false
+          load: true
+          tags: arxiu-backend:scan
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Run Trivy
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: arxiu-backend:scan
+          format: sarif
+          output: trivy-backend.sarif
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+
+      - name: Upload SARIF to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: trivy-backend.sarif
+          category: trivy-backend
+
+  trivy-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build frontend image
+        uses: docker/build-push-action@v6
+        with:
+          context: apps/frontend
+          target: prod
+          push: false
+          load: true
+          tags: arxiu-frontend:scan
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Run Trivy
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: arxiu-frontend:scan
+          format: sarif
+          output: trivy-frontend.sarif
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+
+      - name: Upload SARIF to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: trivy-frontend.sarif
+          category: trivy-frontend

@@ -1,0 +1,15 @@
+/* "Editorial" theme — cream paper, Fraunces serif. */
+
+[data-theme="editorial"] {
+  --bg: oklch(0.965 0.018 80);
+  --bg-2: oklch(0.945 0.022 78);
+  --bg-3: oklch(0.91 0.025 75);
+  --line: oklch(0.78 0.030 75);
+  --line-soft: oklch(0.86 0.025 78);
+  --ink: oklch(0.22 0.020 40);
+  --ink-2: oklch(0.42 0.020 45);
+  --ink-3: oklch(0.58 0.020 50);
+  --accent: oklch(0.42 0.14 25);
+  --accent-bg: oklch(0.92 0.045 30);
+  --serif: "Fraunces", "Times New Roman", serif;
+}

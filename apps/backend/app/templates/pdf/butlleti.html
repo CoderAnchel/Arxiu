@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="utf-8">
+  <title>Butlletí · {{ alumne.nom }} {{ alumne.cognoms }}</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 22mm 18mm 18mm 18mm;
+      @bottom-right {
+        content: "{{ alumne.cognoms }}, {{ alumne.nom }} · pàg. " counter(page);
+        font-size: 8pt;
+        color: #666;
+        font-family: Georgia, serif;
+      }
+    }
+
+    body {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 10pt;
+      color: #1a1a1a;
+      line-height: 1.45;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1.5px solid #1a1a1a;
+      margin-bottom: 18px;
+    }
+
+    .logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #1a1a1a;
+      color: #fff;
+      display: inline-block;
+      text-align: center;
+      line-height: 32px;
+      font-style: italic;
+      font-size: 18pt;
+    }
+
+    .institut-name {
+      font-size: 11pt;
+      font-weight: 700;
+      letter-spacing: 0.5pt;
+    }
+
+    .institut-sub {
+      font-size: 8pt;
+      color: #666;
+    }
+
+    h1 {
+      font-style: italic;
+      font-size: 18pt;
+      margin: 0 0 2px;
+    }
+
+    .eyebrow {
+      font-family: monospace;
+      text-transform: uppercase;
+      letter-spacing: 1pt;
+      font-size: 8pt;
+      color: #666;
+      margin-bottom: 18px;
+    }
+
+    .meta {
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      column-gap: 12px;
+      row-gap: 3px;
+      font-size: 9.5pt;
+      margin-bottom: 16px;
+    }
+
+    .meta dt {
+      color: #666;
+    }
+
+    .meta dd {
+      margin: 0;
+    }
+
+    .meta dd strong {
+      font-weight: 700;
+    }
+
+    table.grades {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 9pt;
+    }
+
+    table.grades thead th {
+      text-align: left;
+      padding: 5px 0;
+      border-bottom: 1px solid #1a1a1a;
+      font-weight: 600;
+    }
+
+    table.grades thead th.right {
+      text-align: right;
+    }
+
+    table.grades tbody td {
+      padding: 5px 0;
+      border-bottom: 0.5px solid #ccc;
+      vertical-align: top;
+    }
+
+    .modul-codi {
+      font-family: monospace;
+      font-size: 8pt;
+      color: #666;
+    }
+
+    .modul-name {
+      font-weight: 500;
+    }
+
+    .ra-list {
+      font-family: monospace;
+      font-size: 8pt;
+      color: #666;
+      margin-top: 2px;
+    }
+
+    .nota {
+      font-family: monospace;
+      font-weight: 600;
+      text-align: right;
+      font-size: 10pt;
+    }
+
+    .nota.suspes {
+      color: #b91c1c;
+    }
+
+    .summary {
+      margin-top: 12px;
+      padding: 8px 0;
+      border-top: 1.5px solid #1a1a1a;
+      display: flex;
+      justify-content: space-between;
+      font-size: 10pt;
+    }
+
+    .summary strong {
+      font-weight: 700;
+    }
+
+    .comments {
+      margin-top: 14px;
+      padding: 10px 12px;
+      background: #f5f0e8;
+      font-size: 9pt;
+      font-style: italic;
+      color: #444;
+    }
+
+    .signatures {
+      margin-top: 28px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 8pt;
+      color: #666;
+    }
+
+    .signatures > div {
+      width: 40%;
+    }
+
+    .sig-line {
+      border-top: 0.5px solid #999;
+      padding-top: 4px;
+      margin-top: 24px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <span class="logo">F</span>
+  <div>
+    <div class="institut-name">INSTITUT LA FERRERIA</div>
+    <div class="institut-sub">Centre formatiu · {{ curs_acad_nom }}</div>
+  </div>
+</div>
+
+<h1>Butlletí de qualificacions</h1>
+<p class="eyebrow">{{ avaluacio.nom }} · {{ grup.codi }} · {{ cicle.codi }}</p>
+
+<dl class="meta">
+  <dt>Alumne/a</dt>
+  <dd><strong>{{ alumne.nom }} {{ alumne.cognoms }}</strong></dd>
+
+  {% if alumne.dni %}<dt>DNI</dt><dd>{{ alumne.dni }}</dd>{% endif %}
+  <dt>NIA / RALC</dt><dd>{{ alumne.ralc }}</dd>
+
+  <dt>Cicle</dt><dd>{{ cicle.nom }}</dd>
+  <dt>Curs</dt><dd>{{ matricula.curs }}r curs · {{ cicle.nivell }}</dd>
+</dl>
+
+<table class="grades">
+  <thead>
+    <tr>
+      <th>Mòdul</th>
+      {% if opts.detall_ra %}<th class="right">Detall RA</th>{% endif %}
+      <th class="right">Nota</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in moduls %}
+    <tr>
+      <td>
+        <div class="modul-codi">{{ row.modul.codi }}</div>
+        <div class="modul-name">{{ row.modul.nom }}</div>
+        {% if opts.detall_ra and row.ra_notes %}
+          <div class="ra-list">
+            {% for ra_note in row.ra_notes -%}
+              {{ ra_note.ra.codi }} {{ '%.1f'|format(ra_note.nota) if ra_note.nota is not none else '—' }}
+              {% if not loop.last %} · {% endif %}
+            {%- endfor %}
+          </div>
+        {% endif %}
+      </td>
+      {% if opts.detall_ra %}<td class="nota">{{ row.ra_notes|length }} RA</td>{% endif %}
+      <td class="nota {% if row.nota is not none and row.nota < 5 %}suspes{% endif %}">
+        {%- if row.nota is none -%}—{%- else -%}{{ '%.1f'|format(row.nota) }}{%- endif -%}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<div class="summary">
+  <span>Mòduls aprovats: {{ aprovats }}/{{ total_moduls }}</span>
+  <span>Mitjana: <strong>{{ '%.2f'|format(mitjana) if mitjana is not none else '—' }}</strong></span>
+</div>
+
+{% if opts.comentaris and comentari_global %}
+<div class="comments">
+  {{ comentari_global }}
+</div>
+{% endif %}
+
+{% if opts.signatura %}
+<div class="signatures">
+  <div>
+    <div class="sig-line">Tutor/a</div>
+  </div>
+  <div>
+    <div class="sig-line">Data · Sabadell</div>
+  </div>
+</div>
+{% endif %}
+
+</body>
+</html>

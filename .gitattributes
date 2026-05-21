@@ -1,0 +1,41 @@
+# Force consistent line endings across operating systems.
+* text=auto eol=lf
+
+# Windows scripts must keep CRLF.
+*.ps1   text eol=crlf
+*.psm1  text eol=crlf
+*.psd1  text eol=crlf
+*.bat   text eol=crlf
+*.cmd   text eol=crlf
+
+# Lockfiles — never diff or merge them; let the package manager regenerate.
+package-lock.json   linguist-generated=true binary
+pnpm-lock.yaml      linguist-generated=true binary
+yarn.lock           linguist-generated=true binary
+uv.lock             linguist-generated=true binary
+Pipfile.lock        linguist-generated=true binary
+
+# Generated artifacts.
+*.snap              linguist-generated=true
+
+# Binary-ish.
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.pdf   binary
+*.woff  binary
+*.woff2 binary
+*.eot   binary
+*.ttf   binary
+*.otf   binary
+*.xlsx  binary
+*.xls   binary
+*.zip   binary
+*.gz    binary
+*.tgz   binary
+
+# Exclude paths from GitHub Linguist language stats (don't skew the bar).
+/docs/**            linguist-documentation
+/infra/**           linguist-vendored
