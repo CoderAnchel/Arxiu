@@ -118,7 +118,7 @@ jobs:
         run: uv run pip-audit --strict || true
 
       - name: 📊 Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: apps/backend/coverage.xml
@@ -171,7 +171,7 @@ jobs:
         run: pnpm audit --audit-level=high || true
 
       - name: 📊 Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: apps/frontend/coverage/coverage-final.json,apps/frontend/coverage/lcov.info
