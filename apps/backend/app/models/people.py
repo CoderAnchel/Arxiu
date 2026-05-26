@@ -45,7 +45,7 @@ class Alumne(Base, TimestampMixin, SoftDeleteMixin):
     data_naixement: Mapped[date | None] = mapped_column(Date, nullable=True)
 
     tutors_legals: Mapped[list[TutorLegal]] = relationship(
-        back_populates="alumne", cascade="all, delete-orphan", lazy="select"
+        back_populates="alumne", cascade="all, delete-orphan", lazy="selectin"
     )
 
     __table_args__ = (

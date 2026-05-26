@@ -1,8 +1,10 @@
 version: 2
 
-# Mantenir dependències al dia. Tots els ecosistemes s'agrupen per evitar
-# desbordament de PRs cada dilluns. Updates de seguretat (vulnerabilitats
-# obertes) van sense agrupar perquè surten al moment.
+# Mantenir dependències al dia. Política conservadora per una app de producció:
+# només patches automàtics (x.y.Z). Minor i major van manualment perquè
+# normalment porten breaking changes amb deps transitives (ex: authlib 1.7
+# vol cryptography>=45, pytest 9 trenca pytest-asyncio, etc).
+# Vulnerabilitats de seguretat van per separat i no respecten aquesta política.
 updates:
   # --- Python (backend) ----------------------------------------------------
   - package-ecosystem: "pip"
@@ -12,14 +14,18 @@ updates:
       day: "monday"
       time: "06:00"
       timezone: "Europe/Madrid"
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 3
     groups:
       backend-deps:
         patterns:
           - "*"
         update-types:
-          - "minor"
           - "patch"
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
+          - "version-update:semver-minor"
     labels:
       - "dependencies"
       - "backend"
@@ -32,14 +38,18 @@ updates:
       day: "monday"
       time: "06:00"
       timezone: "Europe/Madrid"
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 3
     groups:
       frontend-deps:
         patterns:
           - "*"
         update-types:
-          - "minor"
           - "patch"
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
+          - "version-update:semver-minor"
     labels:
       - "dependencies"
       - "frontend"
@@ -64,6 +74,10 @@ updates:
       interval: "weekly"
       day: "monday"
       timezone: "Europe/Madrid"
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
     labels:
       - "dependencies"
       - "docker"
@@ -74,6 +88,10 @@ updates:
       interval: "weekly"
       day: "monday"
       timezone: "Europe/Madrid"
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
     labels:
       - "dependencies"
       - "docker"
