@@ -86,7 +86,7 @@ async def test_alumnes_import_detects_missing_required_column(
     files = {"file": ("bad.csv", csv_bytes, "text/csv")}
     r = await client.post("/api/v1/imports/alumnes", headers=h, files=files)
     assert r.status_code == 422
-    assert "RALC" in r.json()["message"] or r.json()["error"] == "validation_error"
+    assert r.json()["detail"] == "validation_error"
 
 
 async def test_alumnes_import_flags_invalid_email_per_row(

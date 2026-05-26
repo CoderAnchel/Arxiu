@@ -131,6 +131,9 @@ filterwarnings = [
   # it). We don't control that library, so we silence its DeprecationWarning
   # to keep `-W error` strict for our own code.
   "ignore::DeprecationWarning:jose.*",
+  # httpx 0.28 deprecated per-request cookies; refresh-token tests rely on this
+  # pattern because they intentionally test cookie persistence across requests.
+  "ignore::DeprecationWarning:httpx.*",
   # pytest-asyncio emits this for unset default loop scope; the default is fine.
   "ignore::pytest.PytestDeprecationWarning",
 ]

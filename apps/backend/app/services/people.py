@@ -101,6 +101,9 @@ async def create_alumne(
         await session.flush()
     except IntegrityError as exc:
         raise Conflict("alumne amb aquest RALC ja existeix") from exc
+    # Pre-load tutors_legals while still inside the async session greenlet so
+    # FastAPI's response serializer doesn't trigger a lazy-load afterwards.
+    await session.refresh(alumne, attribute_names=["tutors_legals"])
     await audit.record(
         session,
         action="alumne_created",

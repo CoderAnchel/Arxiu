@@ -47,7 +47,7 @@ async def test_login_rejects_wrong_password(client: AsyncClient, db) -> None:
     await make_user(db, dni="33333333C", password="Real-Pwd-1!")
     r = await client.post("/api/v1/auth/login", json={"identifier": "33333333C", "password": "Wrong"})
     assert r.status_code == 401
-    assert r.json()["error"] == "invalid_credentials"
+    assert r.json()["detail"] == "invalid_credentials"
 
 
 async def test_login_rejects_unknown_user(client: AsyncClient) -> None:
@@ -59,7 +59,7 @@ async def test_login_rejects_inactive_user(client: AsyncClient, db) -> None:
     await make_user(db, dni="44444444D", password="Pwd-1!", active=False)
     r = await client.post("/api/v1/auth/login", json={"identifier": "44444444D", "password": "Pwd-1!"})
     assert r.status_code == 403
-    assert r.json()["error"] == "account_inactive"
+    assert r.json()["detail"] == "account_inactive"
 
 
 async def test_login_sets_refresh_cookie(client: AsyncClient, db) -> None:
