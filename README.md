@@ -1,6 +1,6 @@
 # Arxiu de notes
 
-Production grade-management platform for Catalan FP (*Formació Professional*) cycles.
+Production grade-management platform.
 Built as a permanent academic archive — historical data is first-class, not an afterthought.
 
 [![CI](https://github.com/CoderAnchel/Arxiu/actions/workflows/ci.yml/badge.svg)](https://github.com/CoderAnchel/Arxiu/actions/workflows/ci.yml)
