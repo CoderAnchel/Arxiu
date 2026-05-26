@@ -25,12 +25,6 @@ Gestiona el cicle complet d'avaluació d'un institut d'FP:
 - **Exportacions** XLSX/CSV de tot (alumne, grup, mòdul, curs, cicle, docent, auditoria)
 - **Arxiu permanent**: soft delete a tot arreu, paperera amb restauració, log d'auditoria append-only
 
-## Captures
-
-| Qualificacions | Acta de Junta | Expedient |
-|---|---|---|
-| ![Qualificacions](docs/screenshots/qualificacions.png) | ![Acta](docs/screenshots/acta.png) | ![Expedient](docs/screenshots/expedient.png) |
-
 ## Stack
 
 | Capa | Tecnologia |
