@@ -61,7 +61,7 @@ async def test_trash_restore_makes_item_visible_again(client: AsyncClient, db) -
 
     # Listed again in normal endpoint
     r2 = await client.get("/api/v1/alumnes", headers=h)
-    assert any(a["id"] == al["id"] for a in r2.json()["items"])
+    assert any(a["id"] == al["id"] for a in r2.json())
 
 
 async def test_trash_restore_unknown_kind_returns_400(client: AsyncClient, db) -> None:

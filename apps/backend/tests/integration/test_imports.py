@@ -231,7 +231,7 @@ async def test_notes_import_rejects_out_of_range(
         data={"modul_id": ctx["modul_id"], "avaluacio_id": ctx["aval_id"]},
         files=files,
     )
-    assert r.status_code == 200
+    assert r.status_code == 201
     body = r.json()
     assert body["errors"] == 1
     err_row = next(p for p in body["preview"] if p["errors"])
@@ -252,7 +252,7 @@ async def test_notes_import_rejects_non_numeric(
         data={"modul_id": ctx["modul_id"], "avaluacio_id": ctx["aval_id"]},
         files=files,
     )
-    assert r.status_code == 200
+    assert r.status_code == 201
     body = r.json()
     assert body["errors"] == 1
 
