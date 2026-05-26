@@ -10,8 +10,6 @@ Built as a permanent academic archive — historical data is first-class, not an
 [![Python](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/)
 [![Node](https://img.shields.io/badge/node-20+-43853d.svg)](https://nodejs.org/)
 
-> Replace `CoderAnchel/Arxiu` in the badges above with the actual GitHub slug after pushing.
-
 ---
 
 ## Què fa
@@ -28,8 +26,6 @@ Gestiona el cicle complet d'avaluació d'un institut d'FP:
 - **Arxiu permanent**: soft delete a tot arreu, paperera amb restauració, log d'auditoria append-only
 
 ## Captures
-
-> Afegir captures a `docs/screenshots/` i actualitzar aquesta secció.
 
 | Qualificacions | Acta de Junta | Expedient |
 |---|---|---|
