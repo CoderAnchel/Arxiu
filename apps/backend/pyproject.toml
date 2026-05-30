@@ -5,20 +5,20 @@ description = "Arxiu de notes — FastAPI backend for Institut la Ferreria"
 requires-python = ">=3.12"
 dependencies = [
   # Web framework
-  "fastapi==0.115.5",
+  "fastapi==0.115.14",
   "uvicorn[standard]==0.32.1",
   "gunicorn==23.0.0",
-  "python-multipart==0.0.17",
+  "python-multipart==0.0.29",
 
   # Validation / settings
-  "pydantic==2.10.3",
+  "pydantic==2.10.6",
   "pydantic-settings==2.6.1",
   "email-validator==2.2.0",
 
   # Database
-  "sqlalchemy[asyncio]==2.0.36",
-  "asyncmy==0.2.10",
-  "alembic==1.14.0",
+  "sqlalchemy[asyncio]==2.0.50",
+  "asyncmy==0.2.11",
+  "alembic==1.14.1",
 
   # Auth / crypto
   "python-jose[cryptography]==3.3.0",
@@ -29,12 +29,12 @@ dependencies = [
 
   # Background jobs / cache
   "arq==0.26.3",
-  "redis==5.2.0",
+  "redis==5.2.1",
 
   # Files / docs / email
   "openpyxl==3.1.5",
   "weasyprint==63.1",
-  "jinja2==3.1.4",
+  "jinja2==3.1.6",
   "aiosmtplib==3.0.2",
 
   # Networking
@@ -42,7 +42,7 @@ dependencies = [
 
   # Observability
   "structlog==24.4.0",
-  "sentry-sdk[fastapi]==2.19.0",
+  "sentry-sdk[fastapi]==2.19.2",
   "prometheus-client==0.21.1",
 
   # Rate limiting
@@ -51,14 +51,14 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-  "pytest==8.3.4",
-  "pytest-asyncio==0.25.0",
+  "pytest==8.3.5",
+  "pytest-asyncio==0.25.3",
   "pytest-cov==6.0.0",
-  "pytest-mock==3.14.0",
-  "factory-boy==3.3.1",
-  "hypothesis==6.122.3",
+  "pytest-mock==3.14.1",
+  "factory-boy==3.3.3",
+  "hypothesis==6.122.7",
   "respx==0.21.1",
-  "ruff==0.8.4",
+  "ruff==0.8.6",
   "mypy==1.13.0",
   "types-passlib==1.7.7.20240819",
   "types-python-jose==3.3.4.20240106",
@@ -66,7 +66,7 @@ dev = [
   # Fast in-memory DB for unit tests (production uses MySQL via asyncmy)
   "aiosqlite==0.20.0",
   # Used by conftest to mint a transient JWT keypair for the test session
-  "cryptography==44.0.0",
+  "cryptography==44.0.3",
 ]
 
 [build-system]
